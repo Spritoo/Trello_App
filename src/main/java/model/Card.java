@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 
+
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -19,7 +20,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name="Card")
 public class Card {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long cardId;
@@ -107,9 +108,6 @@ public class Card {
 
 
 	public List<String> getComments() {
-		if (comments == null) {
-			comments = new ArrayList<>();
-		}
 		return comments;
 	}
 
@@ -117,4 +115,8 @@ public class Card {
 	public void setComments(List<String> comments) {
 		this.comments = comments;
 	}
+
+
+
+	
 }
