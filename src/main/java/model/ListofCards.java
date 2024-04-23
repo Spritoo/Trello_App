@@ -1,15 +1,17 @@
 package model;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 @Entity
+@Table(name="List")
 public class ListofCards{
 	
 	@Id
@@ -18,17 +20,33 @@ public class ListofCards{
 	
 	private String name;
 	
-	//@OneToMany(mappedBy = "listOfCards")
+	@OneToMany(mappedBy = "listofcards")
+	private Set<Card> cards;
 	
-	private List<Card> cards;
-	
+	public ListofCards(long listId, String name) {
+		super();
+		this.listId = listId;
+		this.name = name;
+	}
+
+	public Set<Card> getCards() {
+		if (cards == null) {
+			cards = new HashSet<>();
+		}
+		return cards;
+	}
+
+	public void setCards(Set<Card> cards) {
+		this.cards = cards;
+	}
+
 	public ListofCards() {
 
 	}
 	
-	public ListofCards(String name, List<Card> cards) {
+	public ListofCards(String name) {
 		this.name = name;
-		this.cards = cards;
+		
 	}
 
 	public long getListId() {
@@ -46,15 +64,5 @@ public class ListofCards{
 	public void setName(String name) {
 		this.name = name;
 	}
-
-	public List<Card> getCards() {
-		return cards;
-	}
-
-	public void setCards(List<Card> cards) {
-		this.cards = cards;
-	}
-	
-
 	
 }
