@@ -35,7 +35,7 @@ public class UserController {
     @PUT
     @Path("/{id}")
     public Response updateUser(@PathParam("id") Long userId, User updatedUser) {
-        updatedUser.setId(userId);
+        updatedUser.setUserId(userId);
         userService.updateUser(updatedUser);
         return Response.ok(updatedUser).build();
     }

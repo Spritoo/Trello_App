@@ -18,7 +18,7 @@ public class ListofCards{
 	
 	private String name;
 	
-	@OneToMany(mappedBy = "listOfCards")
+	//@OneToMany(mappedBy = "listOfCards")
 	
 	private List<Card> cards;
 	

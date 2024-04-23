@@ -20,8 +20,8 @@ public class Card {
 	
 	private long assigendToId;
 	
-	@ManyToOne
-	@JoinColumn(name="listId")
+	//@ManyToOne
+	//@JoinColumn(name="listId")
 	
 	private ListofCards listOfCards;
 	
