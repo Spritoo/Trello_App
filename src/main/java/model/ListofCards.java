@@ -3,11 +3,13 @@ package model;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -20,10 +22,15 @@ public class ListofCards{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long listId;
 
+	@Column(name = "name")
 	private String name;
 	
 	@OneToMany(mappedBy = "listofcards")
 	private Set<Card> cards;
+
+	@ManyToOne
+	@JoinColumn(name = "boardId")
+	private Board board;
 	
 	public ListofCards(long listId, String name) {
 		super();
@@ -49,6 +56,17 @@ public class ListofCards{
 	public ListofCards(String name) {
 		this.name = name;
 		
+	}
+	
+
+	
+
+	public Board getBoard() {
+		return board;
+	}
+
+	public void setBoard(Board board) {
+		this.board = board;
 	}
 
 	public long getListId() {
