@@ -28,10 +28,8 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @ElementCollection
-    private List<String> roles = new ArrayList<>();
 
-    @OneToMany(mappedBy = "assignedTo")
+    @OneToMany(mappedBy = "user")
     private List<Card> cards = new ArrayList<>();
     
     @OneToMany(mappedBy = "user")
@@ -80,11 +78,5 @@ public class User {
         this.password = password;
     }
 
-    public List<String> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(List<String> roles) {
-        this.roles = roles;
-    }
+    
 }

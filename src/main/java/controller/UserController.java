@@ -21,6 +21,13 @@ public class UserController {
         return Response.status(Response.Status.CREATED).entity(user).build();
     }
 
+    @POST
+    @Path("/login")
+    public Response loginUser(User user) {
+        String loginStatus = userService.loginUser(user);
+        return Response.ok(loginStatus).build();
+    }
+    
     @GET
     @Path("/{id}")
     public Response getUserById(@PathParam("id") Long userId) {
