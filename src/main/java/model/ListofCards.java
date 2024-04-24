@@ -3,6 +3,7 @@ package model;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -25,7 +26,7 @@ public class ListofCards{
 	@Column(name = "name")
 	private String name;
 	
-	@OneToMany(mappedBy = "listofcards")
+	@OneToMany(mappedBy = "listofcards",cascade = CascadeType.ALL)
 	private Set<Card> cards;
 
 	@ManyToOne

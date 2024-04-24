@@ -3,12 +3,15 @@ package model;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
 @Entity
@@ -24,9 +27,13 @@ public class Board {
 	@Column(name = "teamLeaderId", nullable = false)
 	private long teamLeaderId;
 	
-	@OneToMany(mappedBy = "board")
+	@OneToMany(mappedBy = "board",cascade = CascadeType.ALL)
 	private Set<ListofCards> lists;
 	
+	@OneToMany(mappedBy = "board")
+    private Set<Board_Members> boardMemberships = new HashSet<>();
+    
+	 
 	@ElementCollection
 	private Set<Long> membersIds = new HashSet<>();
 	

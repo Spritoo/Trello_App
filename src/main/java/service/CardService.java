@@ -54,7 +54,7 @@ public class CardService {
 	public String assignCard(Long cardId, Long userId) {
 		Card card = entityManager.find(Card.class, cardId);
 		if (card != null) {
-			card.setAssigendToId(userId);
+			card.setAssignedToId(userId);
 			return "Card assigned successfully";
 		}
 		return "Card not found";
@@ -102,7 +102,7 @@ public class CardService {
 		ListofCards list = entityManager.find(ListofCards.class, card.getListofcards().getListId());
 		Board board = entityManager.find(Board.class, list.getBoard().getBoardId());
 		Boolean isTeamLeader = false;
-		if (board.getTeamLeaderId() == card.getAssigendToId()) {
+		if (board.getTeamLeaderId() == card.getAssignedToId()) {
 			isTeamLeader = true;
 		}
 		

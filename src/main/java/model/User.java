@@ -1,19 +1,41 @@
 package model;
+
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
+@Table(name="User")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
-    
+
+    @Column(name = "username")
     private String username;
+
+    @Column(name = "email")
     private String email;
+
+    @Column(name = "password")
     private String password;
+
+    @ElementCollection
+    private List<String> roles = new ArrayList<>();
+
+    @OneToMany(mappedBy = "assignedTo")
+    private List<Card> cards = new ArrayList<>();
     
+    @OneToMany(mappedBy = "user")
+    private List<Board_Members> boardMemberships = new ArrayList<>();
     
     
     // Constructors, getters, and setters
@@ -26,22 +48,19 @@ public class User {
         this.password = password;
     }
 
-    // Getters and setters
-   
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
 
     public String getUsername() {
         return username;
     }
 
-    public Long getUserId() {
-		return userId;
-	}
-
-	public void setUserId(Long userId) {
-		this.userId = userId;
-	}
-
-	public void setUsername(String username) {
+    public void setUsername(String username) {
         this.username = username;
     }
 
@@ -59,5 +78,13 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
     }
 }
