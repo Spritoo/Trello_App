@@ -28,7 +28,12 @@ public class User {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "role")
+    private String role;  // Single role variable
 
+//    @OneToMany(mappedBy = "teamLeader")
+//    private List<Board> boards;
+    
     @OneToMany(mappedBy = "user")
     private List<Card> cards = new ArrayList<>();
     
@@ -40,10 +45,11 @@ public class User {
     public User() {
     }
 
-    public User(String username, String email, String password) {
+    public User(String username, String email, String password, String role) {
         this.username = username;
         this.email = email;
         this.password = password;
+        this.role = role;
     }
 
     public Long getUserId() {
@@ -78,5 +84,11 @@ public class User {
         this.password = password;
     }
 
-    
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
 }

@@ -44,13 +44,13 @@ public class CardController {
 		String response = cardService.moveCard(cardId, listId);
 		return Response.status(Response.Status.CREATED).entity(response).build();
 	}
-	
+	/*
 	@DELETE
 	@Path("/delete")
 	public Response deleteCard(Long cardId) {
 		String response = cardService.deleteCard(cardId);
 		return Response.status(Response.Status.CREATED).entity(response).build();
-	}
+	}*/
 	
 	@GET
 	@Path("/get")

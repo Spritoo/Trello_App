@@ -1,9 +1,13 @@
 package service;
 
+import java.util.List;
+
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-import javax.persistence.NoResultException; // Import for exception handling
+import javax.ws.rs.core.Response;
+
 import model.User;
 
 @Stateless
@@ -11,76 +15,64 @@ public class UserService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public String createUser(User user) {
-        try {
+    public Response createUser(User user) {
+    	try {
             // Check if user with the same email already exists
             entityManager.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class)
                 .setParameter("email", user.getEmail())
                 .getSingleResult();
             // User with this email already exists
-            return "User with this email already exists";
+            return Response.status(Response.Status.CONFLICT).entity("User with this email already exists").build();
         } catch (NoResultException e) {
             // User does not exist, proceed to create
             entityManager.persist(user);
-            return "User created successfully";
+            return Response.status(Response.Status.CREATED).entity("User created").build();
         } catch (Exception e) {
             e.printStackTrace();
-            return "Error creating user";
+               return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error creating user").build();
         }
     }
 
-    public String loginUser(User user) {
-        try {
-            User foundUser = entityManager.createQuery("SELECT u FROM User u WHERE u.email = :email AND u.password = :password", User.class)
-                    .setParameter("email", user.getEmail())
-                    .setParameter("password", user.getPassword())
-                    .getSingleResult();
-            if (foundUser != null) {
-                return "User logged in successfully";
-            }
-            return "Invalid email or password";
-        } catch (NoResultException e) {
-            return "User not found";
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Error logging in";
+    public String loginUser(User loginUser) {
+        User user = entityManager.createQuery("SELECT u FROM User u WHERE u.email = :email AND u.password = :password", User.class)
+                .setParameter("email", loginUser.getEmail())
+                .setParameter("password", loginUser.getPassword())
+                .getSingleResult();
+        if (user != null) {
+            // Set the role based on user input (assuming it comes from the frontend)
+            user.setRole(loginUser.getRole());
+            return "User logged in successfully";
         }
+        return "User not found";
     }
 
     public String updateUser(User updatedUser) {
-        try {
-            User user = entityManager.find(User.class, updatedUser.getUserId());
-            if (user != null) {
-                entityManager.merge(updatedUser);
-                return "User updated successfully";
-            }
-            return "User not found";
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Error updating user";
+        User user = entityManager.createQuery("SELECT u FROM User u WHERE u.userId = :userId", User.class)
+                .setParameter("userId", updatedUser.getUserId()).getSingleResult();
+        if (user != null) {
+            // Update other user details as needed
+            user.setUsername(updatedUser.getUsername());
+            user.setEmail(updatedUser.getEmail());
+            user.setPassword(updatedUser.getPassword());
+            user.setRole(updatedUser.getRole());  // Update role
+            entityManager.merge(user);
+            return "User updated successfully";
         }
+        return "User not found";
     }
 
     public String deleteUser(Long userId) {
-        try {
-            User user = entityManager.find(User.class, userId);
-            if (user != null) {
-                entityManager.remove(user);
-                return "User deleted successfully";
-            }
-            return "User not found";
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Error deleting user";
+        User user = entityManager.createQuery("SELECT u FROM User u WHERE u.userId = :userId", User.class)
+                .setParameter("userId", userId).getSingleResult();
+        if (user != null) {
+            entityManager.remove(user);
+            return "User deleted successfully";
         }
+        return "User not found";
     }
 
     public User getUserById(Long userId) {
-        try {
-            return entityManager.find(User.class, userId);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        return entityManager.createQuery("SELECT u FROM User u WHERE u.userId = :userId", User.class)
+                .setParameter("userId", userId).getSingleResult();
     }
 }

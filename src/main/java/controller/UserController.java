@@ -17,8 +17,8 @@ public class UserController {
 
     @POST
     public Response createUser(User user) {
-        userService.createUser(user);
-        return Response.status(Response.Status.CREATED).entity(user).build();
+        Response usercreate = userService.createUser(user);
+        return usercreate;
     }
 
     @POST

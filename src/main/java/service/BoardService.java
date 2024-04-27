@@ -1,14 +1,18 @@
 package service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.ws.rs.core.Response;
 
 import model.Board;
 import model.ListofCards;
+import model.User;
 
 @Stateless
 public class BoardService {
@@ -16,16 +20,32 @@ public class BoardService {
 	@PersistenceContext
 	private EntityManager entityManager;
 
-	public String createBoard(Board board) {
-		Board checkBoard = entityManager.find(Board.class, board.getBoardId());
-		if (checkBoard != null) {
-			return "Board already exists";
-		}
-		entityManager.persist(board);
-		return "Board created successfully";
+	public Response createBoard(User user, Board board) {
+	    // Check if the user has TeamLeader role
+	    if (!user.getRole().equals("TeamLeader")) {
+	        return Response.status(Response.Status.FORBIDDEN).entity("User does not have permission to create a board").build();
+	    }
+
+	    try {
+	        // Check if the board with the same name already exists
+	        Board existingBoard = entityManager.createQuery("SELECT b FROM Board b WHERE b.name = :name", Board.class)
+	                                         .setParameter("name", board.getName())
+	                                         .getSingleResult();
+	        return Response.status(Response.Status.CONFLICT).entity("Board with the same name already exists").build();
+	    } catch (NoResultException e) {
+	        // No board with the same name found, create the board
+	        entityManager.persist(board);
+	        return Response.status(Response.Status.CREATED).entity("Board created successfully").build();
+	    }
 	}
 
-
+/*	public String createBoard(Board board, User user) {
+        if (user.getRole() == "Team Leader") {
+            entityManager.persist(board);
+            return "Board created successfully";
+        }
+        return "User does not have permission to create a board";
+    }
 	public String updateBoard(Board updatedBoard) {
 		
 		Board board = entityManager.find(Board.class, updatedBoard.getBoardId());
@@ -115,6 +135,6 @@ public class BoardService {
 			return board.getMembersIds();
 		}
 		return new HashSet<>();
-	}
+	}*/
 
 }

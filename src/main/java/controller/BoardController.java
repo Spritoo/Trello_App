@@ -6,6 +6,7 @@ import javax.ws.rs.core.*;
 
 import model.Board;
 import model.ListofCards;
+import model.User;
 import service.BoardService;
 
 @Path("/board")
@@ -18,11 +19,12 @@ public class BoardController {
 	
 	@POST
 	@Path("/create")
-	public Response createBoard(Board board) {
-		String response = boardService.createBoard(board);
-		return Response.status(Response.Status.CREATED).entity(response).build();
+	public Response createBoard(User user, Board board) {
+		Response response = boardService.createBoard(user, board);
+		return response;
 	}
 	
+	/*
 	@POST
 	@Path("/addList")
 	public Response addListToBoard(Long boardId, ListofCards listofCards) {
@@ -96,5 +98,5 @@ public class BoardController {
 	public Response getMembers(@PathParam("id") Long boardId) {
 		return Response.ok(boardService.getMembersOfBoard(boardId)).build();
 	}
-	
+	*/
 }

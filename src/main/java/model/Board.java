@@ -27,6 +27,10 @@ public class Board {
 	@Column(name = "teamLeaderId", nullable = false)
 	private long teamLeaderId;
 	
+//	@ManyToOne
+//	@JoinColumn(name = "teamLeader")
+//	private User teamLeader;
+	
 	@OneToMany(mappedBy = "board",cascade = CascadeType.ALL)
 	private Set<ListofCards> lists;
 	
