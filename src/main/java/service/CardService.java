@@ -95,7 +95,7 @@ public class CardService {
 		Card card = entityManager.find(Card.class, cardId);
 		return card;
 	}
-	/*
+	
 	// delete a card.
 	public String deleteCard(Long cardId) {
 		Card card = entityManager.find(Card.class, cardId);
@@ -114,5 +114,5 @@ public class CardService {
 			return "insufficient permissions";
 		}
 		return "Card not found";
-	}*/
+	}
 }
