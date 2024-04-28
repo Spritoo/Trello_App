@@ -40,6 +40,13 @@ public class UserController {
     	   Response loginStatus = userService.loginUser(user);
     	   return loginStatus;
     }
+    
+    @POST
+    @Path("/logout")
+	public Response logoutUser() {
+		Response logoutStatus = userService.logoutUser();
+		return logoutStatus;
+	}
 //    @POST
 //    @Path("/login")
 //    public Response loginUser(User user) {

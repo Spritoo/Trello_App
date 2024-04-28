@@ -9,7 +9,7 @@ import javax.inject.Named;
 import model.User;
 
 @Named
-@Stateful
+@SessionScoped
 public class LoginSession implements Serializable{
 	
 	private static final long serialVersionUID = 1L;

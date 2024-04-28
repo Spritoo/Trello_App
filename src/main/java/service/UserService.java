@@ -63,6 +63,10 @@ public class UserService {
 		}
 	}
 	
+	public Response logoutUser() {
+		loginSession.setUser(null);
+		return Response.status(Response.Status.OK).entity("User logged out successfully").build();
+	}
 //    public String loginUser(User loginUser) {
 //        User user = entityManager.createQuery("SELECT u FROM User u WHERE u.email = :email AND u.password = :password", User.class)
 //                .setParameter("email", loginUser.getEmail())

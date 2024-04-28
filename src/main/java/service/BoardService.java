@@ -26,12 +26,13 @@ public class BoardService {
 	@Inject
 	private LoginSession loginSession;
 	
-	//TODO::test this method idk lw it throws an exception with same board name bas it should 3lshan board name
-	//has unique name constraint
 	public Response createBoard(Board board) {
-		
+		User logedUser = loginSession.getUser();
+		if (logedUser == null) {
+			return Response.status(Response.Status.UNAUTHORIZED).entity("User not logged in").build();
+		}
 	        try {
-	        User user = entityManager.find(User.class, loginSession.getUser().getUserId());
+	        User user = entityManager.find(User.class, logedUser.getUserId());
 			if (user == null || !user.isLeader()) {
 				return Response.status(Response.Status.NOT_FOUND).entity("User not found or doesnt have authority").build();
 			} else 
