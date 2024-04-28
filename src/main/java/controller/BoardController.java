@@ -18,9 +18,9 @@ public class BoardController {
 	private BoardService boardService;
 	
 	@POST
-	@Path("/create/{id}")
-	public Response createBoard(@PathParam("id") long id,Board board) {
-		Response response = boardService.createBoard(id,board);
+	@Path("/create")
+	public Response createBoard(Board board) {
+		Response response = boardService.createBoard(board);
 		return response;
 	}
 	

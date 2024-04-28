@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
@@ -14,6 +15,7 @@ import javax.ws.rs.core.Response;
 import model.Board;
 import model.ListofCards;
 import model.User;
+import util.LoginSession;
 
 @Stateless
 public class BoardService {
@@ -21,12 +23,15 @@ public class BoardService {
 	@PersistenceContext
 	private EntityManager entityManager;
 	
+	@Inject
+	private LoginSession loginSession;
+	
 	//TODO::test this method idk lw it throws an exception with same board name bas it should 3lshan board name
 	//has unique name constraint
-	public Response createBoard(long userId, Board board) {
+	public Response createBoard(Board board) {
 		
 	        try {
-	        User user = entityManager.find(User.class, userId);
+	        User user = entityManager.find(User.class, loginSession.getUser().getUserId());
 			if (user == null || !user.isLeader()) {
 				return Response.status(Response.Status.NOT_FOUND).entity("User not found or doesnt have authority").build();
 			} else 

@@ -33,7 +33,13 @@ public class UserController {
 		Response updatedUser = userService.updateUser(user);
 		return updatedUser;
 	}
-
+    
+    @POST
+    @Path("/login")
+    public Response loginUser(User user) {
+    	   Response loginStatus = userService.loginUser(user);
+    	   return loginStatus;
+    }
 //    @POST
 //    @Path("/login")
 //    public Response loginUser(User user) {

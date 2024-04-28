@@ -2,18 +2,24 @@ package service;
 
 import java.util.List;
 
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.ws.rs.core.Response;
 
 import model.User;
+import util.LoginSession;
 
 @Stateless
 public class UserService {
     @PersistenceContext
     private EntityManager entityManager;
+    
+    @Inject
+    private LoginSession loginSession;
 
     public Response createUser(User user) {
     	
@@ -40,6 +46,23 @@ public class UserService {
 		}
 		return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
 	}
+	
+	public Response loginUser(User user) {
+		try {
+			User existingUser = entityManager.find(User.class, user.getUserId());
+			if (existingUser != null) {
+				if (existingUser.getPassword().equals(user.getPassword())) {
+					loginSession.setUser(existingUser);
+					return Response.status(Response.Status.OK).entity("User logged in successfully").build();
+				}
+				return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid password").build();
+			}
+			return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
+		} catch (NoResultException e) {
+			return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
+		}
+	}
+	
 //    public String loginUser(User loginUser) {
 //        User user = entityManager.createQuery("SELECT u FROM User u WHERE u.email = :email AND u.password = :password", User.class)
 //                .setParameter("email", loginUser.getEmail())
