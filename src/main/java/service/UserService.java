@@ -16,50 +16,44 @@ public class UserService {
     private EntityManager entityManager;
 
     public Response createUser(User user) {
-    	try {
-            // Check if user with the same email already exists
-            entityManager.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class)
-                .setParameter("email", user.getEmail())
-                .getSingleResult();
-            // User with this email already exists
-            return Response.status(Response.Status.CONFLICT).entity("User with this email already exists").build();
-        } catch (NoResultException e) {
-            // User does not exist, proceed to create
-            entityManager.persist(user);
-            return Response.status(Response.Status.CREATED).entity("User created").build();
-        } catch (Exception e) {
-            e.printStackTrace();
-               return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error creating user").build();
-        }
+    	
+		try {
+			entityManager.persist(user);
+			return Response.status(Response.Status.CREATED).entity("User created successfully").build();
+			
+		} catch (Exception e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("User already exists").build();
+		}
+		
     }
 
-    public String loginUser(User loginUser) {
-        User user = entityManager.createQuery("SELECT u FROM User u WHERE u.email = :email AND u.password = :password", User.class)
-                .setParameter("email", loginUser.getEmail())
-                .setParameter("password", loginUser.getPassword())
-                .getSingleResult();
-        if (user != null) {
-            // Set the role based on user input (assuming it comes from the frontend)
-            user.setRole(loginUser.getRole());
-            return "User logged in successfully";
-        }
-        return "User not found";
-    }
+//    public String loginUser(User loginUser) {
+//        User user = entityManager.createQuery("SELECT u FROM User u WHERE u.email = :email AND u.password = :password", User.class)
+//                .setParameter("email", loginUser.getEmail())
+//                .setParameter("password", loginUser.getPassword())
+//                .getSingleResult();
+//        if (user != null) {
+//            // Set the role based on user input (assuming it comes from the frontend)
+//            user.setRole(loginUser.getRole());
+//            return "User logged in successfully";
+//        }
+//        return "User not found";
+//    }
 
-    public String updateUser(User updatedUser) {
-        User user = entityManager.createQuery("SELECT u FROM User u WHERE u.userId = :userId", User.class)
-                .setParameter("userId", updatedUser.getUserId()).getSingleResult();
-        if (user != null) {
-            // Update other user details as needed
-            user.setUsername(updatedUser.getUsername());
-            user.setEmail(updatedUser.getEmail());
-            user.setPassword(updatedUser.getPassword());
-            user.setRole(updatedUser.getRole());  // Update role
-            entityManager.merge(user);
-            return "User updated successfully";
-        }
-        return "User not found";
-    }
+//    public String updateUser(User updatedUser) {
+//        User user = entityManager.createQuery("SELECT u FROM User u WHERE u.userId = :userId", User.class)
+//                .setParameter("userId", updatedUser.getUserId()).getSingleResult();
+//        if (user != null) {
+//            // Update other user details as needed
+//            user.setUsername(updatedUser.getUsername());
+//            user.setEmail(updatedUser.getEmail());
+//            user.setPassword(updatedUser.getPassword());
+//            user.setRole(updatedUser.getRole());  // Update role
+//            entityManager.merge(user);
+//            return "User updated successfully";
+//        }
+//        return "User not found";
+//    }
 
     public String deleteUser(Long userId) {
         User user = entityManager.createQuery("SELECT u FROM User u WHERE u.userId = :userId", User.class)

@@ -17,27 +17,27 @@ public class CardService {
 	private EntityManager entityManager;
 	
 	// create a new card.
-	public String createCard(Card card, Long userId) {
-		Card checkCard = entityManager.find(Card.class, card.getCardId());
-		ListofCards list = entityManager.find(ListofCards.class, card.getListofcards().getListId());
-		Board board = entityManager.find(Board.class, list.getBoard().getBoardId());
-		Boolean isMember = false;
-		for (Long memberId : board.getMembersIds()) {
-			if (memberId == userId) {
-				isMember = true;
-				break;
-			}
-		}
-		if (checkCard != null) {
-			return "Card already exists";
-		}
-		if (!isMember) {
-			return "User is not a member of the board";
-		}
-		entityManager.persist(card);
-		return "Card created successfully";
-		
-	}
+//	public String createCard(Card card, Long userId) {
+//		Card checkCard = entityManager.find(Card.class, card.getCardId());
+//		ListofCards list = entityManager.find(ListofCards.class, card.getListofcards().getListId());
+//		Board board = entityManager.find(Board.class, list.getBoard().getBoardId());
+//		Boolean isMember = false;
+//		for (Long memberId : board.getMembersIds()) {
+//			if (memberId == userId) {
+//				isMember = true;
+//				break;
+//			}
+//		}
+//		if (checkCard != null) {
+//			return "Card already exists";
+//		}
+//		if (!isMember) {
+//			return "User is not a member of the board";
+//		}
+//		entityManager.persist(card);
+//		return "Card created successfully";
+//		
+//	}
 	
 	// move cards between lists.
 	public String moveCard(Long cardId, Long listId) {
@@ -97,22 +97,22 @@ public class CardService {
 	}
 	
 	// delete a card.
-	public String deleteCard(Long cardId) {
-		Card card = entityManager.find(Card.class, cardId);
-		ListofCards list = entityManager.find(ListofCards.class, card.getListofcards().getListId());
-		Board board = entityManager.find(Board.class, list.getBoard().getBoardId());
-		Boolean isTeamLeader = false;
-		if (board.getTeamLeaderId() == card.getAssignedToId()) {
-			isTeamLeader = true;
-		}
-		
-		if (card != null && isTeamLeader) {
-			entityManager.remove(card);
-			return "Card deleted successfully";
-		}
-		if (isTeamLeader) {
-			return "insufficient permissions";
-		}
-		return "Card not found";
-	}
+//	public String deleteCard(Long cardId) {
+//		Card card = entityManager.find(Card.class, cardId);
+//		ListofCards list = entityManager.find(ListofCards.class, card.getListofcards().getListId());
+//		Board board = entityManager.find(Board.class, list.getBoard().getBoardId());
+//		Boolean isTeamLeader = false;
+//		if (board.getTeamLeaderId() == card.getAssignedToId()) {
+//			isTeamLeader = true;
+//		}
+//		
+//		if (card != null && isTeamLeader) {
+//			entityManager.remove(card);
+//			return "Card deleted successfully";
+//		}
+//		if (isTeamLeader) {
+//			return "insufficient permissions";
+//		}
+//		return "Card not found";
+//	}
 }

@@ -6,89 +6,94 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
-@Table(name="User")
+@Table(name="User", uniqueConstraints = @UniqueConstraint(columnNames = {"email"}))
 public class User {
-    @Id
+	
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
     @Column(name = "username")
     private String username;
-
+    
     @Column(name = "email")
     private String email;
 
     @Column(name = "password")
     private String password;
-
-    @Column(name = "role")
-    private String role;  // Single role variable
-
-//    @OneToMany(mappedBy = "teamLeader")
-//    private List<Board> boards;
     
-    @OneToMany(mappedBy = "user")
-    private List<Card> cards = new ArrayList<>();
+    // if the user is a team leader
+    @OneToMany(mappedBy = "teamLeader")
+    private Set<Board> boardsAsLeader = new HashSet<>();
     
-    @OneToMany(mappedBy = "user")
-    private List<Board_Members> boardMemberships = new ArrayList<>();
+    // if the user is a member
+    @ManyToMany
+    @JoinTable(
+        name = "user_contributions",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "board_id")
+    )
+    private Set<User> contributedBoards = new HashSet<>();
     
+    public User(Long userId, String username, String email, String password) {
+		super();
+		this.userId = userId;
+		this.username = username;
+		this.email = email;
+		this.password = password;
+	}
     
-    // Constructors, getters, and setters
     public User() {
     }
 
-    public User(String username, String email, String password, String role) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-    }
+	public Long getUserId() {
+		return userId;
+	}
 
-    public Long getUserId() {
-        return userId;
-    }
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
+	public String getUsername() {
+		return username;
+	}
 
-    public String getUsername() {
-        return username;
-    }
+	public void setUsername(String username) {
+		this.username = username;
+	}
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+	public String getEmail() {
+		return email;
+	}
 
-    public String getEmail() {
-        return email;
-    }
+	public void setEmail(String email) {
+		this.email = email;
+	}
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+	public String getPassword() {
+		return password;
+	}
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
+	public void setPassword(String password) {
+		this.password = password;
+	}
+    
+    
+    
+    
+    
 }

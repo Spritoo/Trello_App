@@ -8,6 +8,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.ws.rs.core.Response;
 
 import model.Board;
@@ -19,24 +20,32 @@ public class BoardService {
 	
 	@PersistenceContext
 	private EntityManager entityManager;
-
-	public Response createBoard(User user, Board board) {
-	    // Check if the user has TeamLeader role
-	    if (!user.getRole().equals("TeamLeader")) {
-	        return Response.status(Response.Status.FORBIDDEN).entity("User does not have permission to create a board").build();
-	    }
-
-	    try {
-	        // Check if the board with the same name already exists
-	        Board existingBoard = entityManager.createQuery("SELECT b FROM Board b WHERE b.name = :name", Board.class)
-	                                         .setParameter("name", board.getName())
-	                                         .getSingleResult();
-	        return Response.status(Response.Status.CONFLICT).entity("Board with the same name already exists").build();
-	    } catch (NoResultException e) {
-	        // No board with the same name found, create the board
+	
+	//TODO::test this method idk lw it throws an exception with same board name bas it should 3lshan board name
+	//has unique name constraint
+	public Response createBoard(long userId, Board board) {
+		
+	        try {
+	        User user = entityManager.find(User.class, userId);
+	        board.setTeamLeader(user);
 	        entityManager.persist(board);
 	        return Response.status(Response.Status.CREATED).entity("Board created successfully").build();
-	    }
+	        
+	    } catch (PersistenceException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Board with same name or teamLeader doesnt exist").build();
+        }
+	        
+	}
+	
+	public Response updateBoard(Board updatedBoard) {
+        Board board = entityManager.find(Board.class, updatedBoard.getBoardId());
+        if (board != null) {
+            entityManager.merge(updatedBoard);
+            return Response.status(Response.Status.CREATED).entity("Board updated successfully").build();
+        }
+        return Response.status(Response.Status.NOT_FOUND).entity("Board not found").build();
+    }
+	
 	}
 
 /*	public String createBoard(Board board, User user) {
@@ -137,4 +146,3 @@ public class BoardService {
 		return new HashSet<>();
 	}*/
 
-}
