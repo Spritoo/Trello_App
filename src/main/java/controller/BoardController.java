@@ -24,6 +24,11 @@ public class BoardController {
 		return response;
 	}
 	
+	@GET
+	public Response getBoards() {
+		Response response = boardService.getBoards();
+		return response;
+	}
 	/*
 	@POST
 	@Path("/addList")

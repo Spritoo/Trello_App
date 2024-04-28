@@ -26,7 +26,20 @@ public class UserService {
 		}
 		
     }
+    
+	public Response getUsers() {
+    	List<User> users = entityManager.createQuery("SELECT u FROM User u", User.class).getResultList();
+    	return Response.ok(users).build();
+    }
 
+	public Response updateUser(User user) {
+		User updatedUser = entityManager.find(User.class, user.getUserId());
+		if (updatedUser != null) {
+			entityManager.merge(user);
+			return Response.status(Response.Status.CREATED).entity("User updated successfully").build();
+		}
+		return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
+	}
 //    public String loginUser(User loginUser) {
 //        User user = entityManager.createQuery("SELECT u FROM User u WHERE u.email = :email AND u.password = :password", User.class)
 //                .setParameter("email", loginUser.getEmail())

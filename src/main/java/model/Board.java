@@ -1,12 +1,14 @@
 package model;
 
 import java.util.HashSet;
+
 import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -17,6 +19,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "Board", uniqueConstraints = @UniqueConstraint(columnNames = {"name"}))
@@ -34,44 +38,85 @@ public class Board {
 	@NotNull
 	@ManyToOne
     @JoinColumn(name = "team_leader_id")
+	@JsonIgnore
     private User teamLeader;
 	
-	@OneToMany(mappedBy = "board",cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "board",cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private Set<ListofCards> lists;
 	
 	//members are the users who are part of the board
 	@ManyToMany(mappedBy = "contributedBoards")
+	@JsonIgnore
     private Set<User> contributors = new HashSet<>();
 	 
-	@ElementCollection
+	@ElementCollection(fetch = FetchType.EAGER)
 	private Set<Long> membersIds = new HashSet<>();
 	
+	private long teamLeaderId;
+	
 	public Board() {
+		super();
+	}
 
-	}
-	
-	public Board(String name, User teamLeader) {
-		this.name = name;
-		this.teamLeader = teamLeader;
-	}
-	
-	public long getBoardId() {
-        return boardId;
-    }
-	
-	public void setBoardId(long boardId) {
+	public Board(long boardId, @NotNull String name) {
+		super();
 		this.boardId = boardId;
-	}
-	
-	public String getName() {
-		return name;
-	}
-	
-	public void setName(String name) {
 		this.name = name;
 	}
 	
 	public void setTeamLeader(User teamLeader) {
 		this.teamLeader = teamLeader;
+		teamLeaderId = teamLeader.getUserId();
 	}
+	
+	public void setContributers(Set<User> contributors) {
+		this.contributors = contributors;
+		for (User user : contributors) {
+			membersIds.add(user.getUserId());
+		}
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public long getBoardId() {
+		return boardId;
+	}
+	
+	public void setBoardId(long boardId) {
+		this.boardId = boardId;
+	}
+	
+	public User getTeamLeader() {
+		return teamLeader;
+	}
+	
+	public Set<User> getContributors() {
+		return contributors;
+	}
+	
+	public Set<Long> getMembersIds() {
+		return membersIds;
+	}
+	
+	public long getTeamLeaderId() {
+		return teamLeaderId;
+	}
+	
+//	public Set<ListofCards> getLists() {
+//		return lists;
+//	}
+//	
+//	public void setLists(Set<ListofCards> lists) {
+//		this.lists = lists;
+//	}
+//	
+	
+	
+	
 }

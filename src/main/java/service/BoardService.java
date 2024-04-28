@@ -27,9 +27,12 @@ public class BoardService {
 		
 	        try {
 	        User user = entityManager.find(User.class, userId);
+			if (user == null || !user.isLeader()) {
+				return Response.status(Response.Status.NOT_FOUND).entity("User not found or doesnt have authority").build();
+			} else 
 	        board.setTeamLeader(user);
 	        entityManager.persist(board);
-	        return Response.status(Response.Status.CREATED).entity("Board created successfully").build();
+	        return Response.status(Response.Status.CREATED).entity("Board created successfully with id: " + board.getBoardId()).build();
 	        
 	    } catch (PersistenceException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Board with same name or teamLeader doesnt exist").build();
@@ -37,14 +40,10 @@ public class BoardService {
 	        
 	}
 	
-	public Response updateBoard(Board updatedBoard) {
-        Board board = entityManager.find(Board.class, updatedBoard.getBoardId());
-        if (board != null) {
-            entityManager.merge(updatedBoard);
-            return Response.status(Response.Status.CREATED).entity("Board updated successfully").build();
-        }
-        return Response.status(Response.Status.NOT_FOUND).entity("Board not found").build();
-    }
+	public Response getBoards() {
+		List<Board> boards = entityManager.createQuery("SELECT b FROM Board b", Board.class).getResultList();
+		return Response.ok(boards).build();
+	}
 	
 	}
 

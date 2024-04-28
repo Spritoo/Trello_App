@@ -16,10 +16,23 @@ public class UserController {
     private UserService userService;
 
     @POST
+    @Path("/create")
     public Response createUser(User user) {
         Response usercreate = userService.createUser(user);
         return usercreate;
     }
+    
+    @GET
+	public Response getUsers() {
+    	Response users = userService.getUsers();
+		return users;
+	}
+    
+    @POST
+	public Response updateUser(User user) {
+		Response updatedUser = userService.updateUser(user);
+		return updatedUser;
+	}
 
 //    @POST
 //    @Path("/login")
