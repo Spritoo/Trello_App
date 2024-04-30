@@ -1,10 +1,13 @@
 package service;
 
 import java.util.HashSet;
+
 import java.util.List;
 import java.util.Set;
 
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -15,7 +18,6 @@ import javax.ws.rs.core.Response;
 import model.Board;
 import model.ListofCards;
 import model.User;
-import util.LoginSession;
 
 @Stateless
 public class BoardService {
@@ -23,32 +25,41 @@ public class BoardService {
 	@PersistenceContext
 	private EntityManager entityManager;
 	
-	@Inject
-	private LoginSession loginSession;
-	
-	public Response createBoard(Board board) {
-		User logedUser = loginSession.getUser();
-		if (logedUser == null) {
-			return Response.status(Response.Status.UNAUTHORIZED).entity("User not logged in").build();
+//	@Inject
+//	private LoginSession loginSession;
+//	
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Response createBoard(Board board, long userId) {
+		User user = entityManager.find(User.class, userId);
+		if (user == null) {
+			return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
+		} else {
+			board.setTeamLeader(user);
+			entityManager.persist(board);
+			return Response.status(Response.Status.CREATED).entity("Board created successfully").build();
 		}
-	        try {
-	        User user = entityManager.find(User.class, logedUser.getUserId());
-			if (user == null || !user.isLeader()) {
-				return Response.status(Response.Status.NOT_FOUND).entity("User not found or doesnt have authority").build();
-			} else 
-	        board.setTeamLeader(user);
-	        entityManager.persist(board);
-	        return Response.status(Response.Status.CREATED).entity("Board created successfully with id: " + board.getBoardId()).build();
-	        
-	    } catch (PersistenceException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Board with same name or teamLeader doesnt exist").build();
-        }
-	        
 	}
 	
 	public Response getBoards() {
 		List<Board> boards = entityManager.createQuery("SELECT b FROM Board b", Board.class).getResultList();
 		return Response.ok(boards).build();
+	}
+	
+	
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public Response inviteMember(Long boardId, Long memberId) {
+		User user = entityManager.find(User.class, memberId);
+		if (user == null) {
+			return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
+		} else {
+			Board board = entityManager.find(Board.class, boardId);
+			if (board == null) {
+				return Response.status(Response.Status.NOT_FOUND).entity("Board not found").build();
+			} else {
+				board.addMember(user);
+				return Response.status(Response.Status.CREATED).entity("User added successfully").build();
+			}
+		}
 	}
 	
 	}

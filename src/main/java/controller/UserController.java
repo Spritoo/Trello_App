@@ -20,7 +20,6 @@ public class UserController {
     private UserService userService;
 
     @POST
-    @RolesAllowed("leader")
     @Path("/create")
     public Response createUser(User user) {
         Response usercreate = userService.createUser(user);
@@ -39,19 +38,7 @@ public class UserController {
 		return updatedUser;
 	}
     
-    @POST
-    @Path("/login")
-    public Response loginUser(User user) {
-    	   Response loginStatus = userService.loginUser(user);
-    	   return loginStatus;
-    }
     
-    @POST
-    @Path("/logout")
-	public Response logoutUser() {
-		Response logoutStatus = userService.logoutUser();
-		return logoutStatus;
-	}
 //    @POST
 //    @Path("/login")
 //    public Response loginUser(User user) {

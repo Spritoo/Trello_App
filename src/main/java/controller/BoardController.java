@@ -18,15 +18,22 @@ public class BoardController {
 	private BoardService boardService;
 	
 	@POST
-	@Path("/create")
-	public Response createBoard(Board board) {
-		Response response = boardService.createBoard(board);
+	@Path("/create/{userId}")
+	public Response createBoard(Board board, @PathParam("userId") Long userId) {
+		Response response = boardService.createBoard(board, userId);
 		return response;
 	}
 	
 	@GET
 	public Response getBoards() {
 		Response response = boardService.getBoards();
+		return response;
+	}
+	
+	@PUT
+	@Path("/inviteMember/{userId}/{boardId}")
+	public Response inviteUser(@PathParam("userId") Long userId,@PathParam("boardId")Long boardId) {
+		Response response = boardService.inviteMember(boardId, userId);
 		return response;
 	}
 	/*

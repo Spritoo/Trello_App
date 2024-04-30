@@ -108,6 +108,11 @@ public class Board {
 		return teamLeaderId;
 	}
 	
+	public void addMember(User user) {
+		contributors.add(user);
+		membersIds.add(user.getUserId());
+	}
+	
 //	public Set<ListofCards> getLists() {
 //		return lists;
 //	}
