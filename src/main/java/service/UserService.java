@@ -21,19 +21,17 @@ public class UserService {
     
 //    @Inject
 //    private MessagingSystemService messagingService;
+    
 //    @Inject
 //    private LoginSession loginSession;
 
     public Response createUser(User user) {
     	try {
-            // Check if user with the same email already exists
             entityManager.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class)
                 .setParameter("email", user.getEmail())
                 .getSingleResult();
-            // User with this email already exists
             return Response.status(Response.Status.CONFLICT).entity("User with this email already exists").build();
         } catch (NoResultException e) {
-            // User does not exist, proceed to create
             entityManager.persist(user);
             //messagingService.sendMessage("New user created: " + user.getUsername());
             return Response.status(Response.Status.CREATED).entity("User created").build();
