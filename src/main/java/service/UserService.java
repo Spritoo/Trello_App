@@ -20,18 +20,27 @@ public class UserService {
     private EntityManager entityManager;
     
 //    @Inject
+//    private MessagingSystemService messagingService;
+//    @Inject
 //    private LoginSession loginSession;
 
     public Response createUser(User user) {
-    	
-		try {
-			entityManager.persist(user);
-			return Response.status(Response.Status.CREATED).entity("User created successfully").build();
-			
-		} catch (Exception e) {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("User already exists").build();
-		}
-		
+    	try {
+            // Check if user with the same email already exists
+            entityManager.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class)
+                .setParameter("email", user.getEmail())
+                .getSingleResult();
+            // User with this email already exists
+            return Response.status(Response.Status.CONFLICT).entity("User with this email already exists").build();
+        } catch (NoResultException e) {
+            // User does not exist, proceed to create
+            entityManager.persist(user);
+            //messagingService.sendMessage("New user created: " + user.getUsername());
+            return Response.status(Response.Status.CREATED).entity("User created").build();
+        } catch (Exception e) {
+            e.printStackTrace();
+               return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error creating user").build();
+        }
     }
     
 	public Response getUsers() {
@@ -43,24 +52,23 @@ public class UserService {
 		User updatedUser = entityManager.find(User.class, user.getUserId());
 		if (updatedUser != null) {
 			entityManager.merge(user);
+			//messagingService.sendMessage("User updated: " + user.getUsername());
 			return Response.status(Response.Status.CREATED).entity("User updated successfully").build();
 		}
 		return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
 	}
 	
 	
-//    public String loginUser(User loginUser) {
-//        User user = entityManager.createQuery("SELECT u FROM User u WHERE u.email = :email AND u.password = :password", User.class)
-//                .setParameter("email", loginUser.getEmail())
-//                .setParameter("password", loginUser.getPassword())
-//                .getSingleResult();
-//        if (user != null) {
-//            // Set the role based on user input (assuming it comes from the frontend)
-//            user.setRole(loginUser.getRole());
-//            return "User logged in successfully";
-//        }
-//        return "User not found";
-//    }
+    public String loginUser(User loginUser) {
+        User user = entityManager.createQuery("SELECT u FROM User u WHERE u.email = :email AND u.password = :password", User.class)
+                .setParameter("email", loginUser.getEmail())
+                .setParameter("password", loginUser.getPassword())
+                .getSingleResult();
+        if (user != null) {
+            return "User logged in successfully";
+        }
+        return "User not found";
+    }
 
 //    public String updateUser(User updatedUser) {
 //        User user = entityManager.createQuery("SELECT u FROM User u WHERE u.userId = :userId", User.class)
@@ -82,6 +90,7 @@ public class UserService {
                 .setParameter("userId", userId).getSingleResult();
         if (user != null) {
             entityManager.remove(user);
+            //messagingService.sendMessage("User deleted: " + user.getUsername());
             return "User deleted successfully";
         }
         return "User not found";

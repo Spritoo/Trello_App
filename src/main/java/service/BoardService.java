@@ -26,6 +26,9 @@ public class BoardService {
 	private EntityManager entityManager;
 	
 //	@Inject
+//    private MessagingSystemService messagingService;
+	
+//	@Inject
 //	private LoginSession loginSession;
 //	
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
@@ -36,6 +39,7 @@ public class BoardService {
 		} else {
 			board.setTeamLeader(user);
 			entityManager.persist(board);
+			//messagingService.sendMessage("New board created: " + board.getName());
 			return Response.status(Response.Status.CREATED).entity("Board created successfully").build();
 		}
 	}
@@ -57,49 +61,49 @@ public class BoardService {
 				return Response.status(Response.Status.NOT_FOUND).entity("Board not found").build();
 			} else {
 				board.addMember(user);
+				//messagingService.sendMessage("User invited to board: " + user.getUsername());
 				return Response.status(Response.Status.CREATED).entity("User added successfully").build();
 			}
 		}
 	}
 	
-	}
+	
 
-/*	public String createBoard(Board board, User user) {
-        if (user.getRole() == "Team Leader") {
-            entityManager.persist(board);
-            return "Board created successfully";
-        }
-        return "User does not have permission to create a board";
-    }
-	public String updateBoard(Board updatedBoard) {
-		
-		Board board = entityManager.find(Board.class, updatedBoard.getBoardId());
-		if (board != null) {
-			entityManager.merge(updatedBoard);
-			return "Board updated successfully";
-		}
-		return "Board not found";
-	}
-	
-	
-	public String updateTeamLeader(Long boardId, Long teamLeaderId) {
-		Board board = entityManager.find(Board.class, boardId);
-		if (board != null) {
-			board.setTeamLeaderId(teamLeaderId);
-			return "Team Leader updated successfully";
-		}
-		return "Board not found";
-	}
-	
+//	public String createBoard(Board board, User user) {
+//        if (user.getRole() == "Team Leader") {
+//            entityManager.persist(board);
+//            return "Board created successfully";
+//        }
+//        return "User does not have permission to create a board";
+//    }
+//	public String updateBoard(Board updatedBoard) {
+//		
+//		Board board = entityManager.find(Board.class, updatedBoard.getBoardId());
+//		if (board != null) {
+//			entityManager.merge(updatedBoard);
+//			return "Board updated successfully";
+//		}
+//		return "Board not found";
+//	}
+//	
+//	
+//	public String updateTeamLeader(Long boardId, Long teamLeaderId) {
+//		Board board = entityManager.find(Board.class, boardId);
+//		if (board != null) {
+//			board.setTeamLeaderId(teamLeaderId);
+//			return "Team Leader updated successfully";
+//		}
+//		return "Board not found";
+//	}
+//	
 	public String addListToBoard(Long boardId, ListofCards list) {
 		Board board = entityManager.find(Board.class, boardId);
 		if (board != null) {
 			board.getLists().add(list);
-			list.setBoard(board);
 			return "List added successfully";
 		}
 		return "Board not found";
-	}
+		}
 	
 	public String addMemberToBoard(Long boardId, Long memberId) {
 		Board board = entityManager.find(Board.class, boardId);
@@ -160,5 +164,6 @@ public class BoardService {
 			return board.getMembersIds();
 		}
 		return new HashSet<>();
-	}*/
+	}
+}
 

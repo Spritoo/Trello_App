@@ -113,14 +113,14 @@ public class Board {
 		membersIds.add(user.getUserId());
 	}
 	
-//	public Set<ListofCards> getLists() {
-//		return lists;
-//	}
-//	
-//	public void setLists(Set<ListofCards> lists) {
-//		this.lists = lists;
-//	}
-//	
+	public Set<ListofCards> getLists() {
+		return lists;
+	}
+	
+	public void setLists(Set<ListofCards> lists) {
+		this.lists = lists;
+	}
+	
 	
 	
 	

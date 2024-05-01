@@ -40,9 +40,9 @@ public class User {
     @Column(name = "password")
     private String password;
     
-    @NotNull
-    @Column(name = "leader")
-    private boolean leader;
+//    @NotNull
+//    @Column(name = "leader")
+//    private boolean leader;
     
     // if the user is a team leader
     @JsonIgnore
@@ -66,15 +66,22 @@ public class User {
 	}
 
 
-	public User(Long userId, String username, @NotNull String email, String password, @NotNull boolean leader) {
+//	public User(Long userId, String username, @NotNull String email, String password, @NotNull boolean leader) {
+//		super();
+//		this.userId = userId;
+//		this.username = username;
+//		this.email = email;
+//		this.password = password;
+//		this.leader = leader;
+//	}
+
+	public User(Long userId, String username, @NotNull String email, String password) {
 		super();
 		this.userId = userId;
 		this.username = username;
 		this.email = email;
 		this.password = password;
-		this.leader = leader;
 	}
-
 
 	public Long getUserId() {
 		return userId;
@@ -116,14 +123,14 @@ public class User {
 	}
 
 
-	public boolean isLeader() {
-		return leader;
-	}
-
-
-	public void setRole(boolean leader) {
-		this.leader = leader;
-	}
+//	public boolean isLeader() {
+//		return leader;
+//	}
+//
+//
+//	public void setRole(boolean leader) {
+//		this.leader = leader;
+//	}
 
 
 	public Set<Board> getBoardsAsLeader() {

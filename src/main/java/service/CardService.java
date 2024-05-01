@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
@@ -16,28 +17,33 @@ public class CardService {
 	@PersistenceContext
 	private EntityManager entityManager;
 	
-	// create a new card.
-//	public String createCard(Card card, Long userId) {
-//		Card checkCard = entityManager.find(Card.class, card.getCardId());
-//		ListofCards list = entityManager.find(ListofCards.class, card.getListofcards().getListId());
-//		Board board = entityManager.find(Board.class, list.getBoard().getBoardId());
-//		Boolean isMember = false;
-//		for (Long memberId : board.getMembersIds()) {
-//			if (memberId == userId) {
-//				isMember = true;
-//				break;
-//			}
-//		}
-//		if (checkCard != null) {
-//			return "Card already exists";
-//		}
-//		if (!isMember) {
-//			return "User is not a member of the board";
-//		}
-//		entityManager.persist(card);
-//		return "Card created successfully";
-//		
-//	}
+	
+//	@Inject
+//	private MessagingSystemService messagingService;
+	
+	//create a new card.
+	public String createCard(Card card, Long userId) {
+		Card checkCard = entityManager.find(Card.class, card.getCardId());
+		ListofCards list = entityManager.find(ListofCards.class, card.getListofcards().getListId());
+		Board board = entityManager.find(Board.class, list.getBoard().getBoardId());
+		Boolean isMember = false;
+		for (Long memberId : board.getMembersIds()) {
+			if (memberId == userId) {
+				isMember = true;
+				break;
+			}
+		}
+		if (checkCard != null) {
+			return "Card already exists";
+		}
+		if (!isMember) {
+			return "User is not a member of the board";
+		}
+		entityManager.persist(card);
+        //messagingService.sendMessage("New card created: " + card.getName());
+		return "Card created successfully";
+		
+	}
 	
 	// move cards between lists.
 	public String moveCard(Long cardId, Long listId) {
@@ -55,6 +61,7 @@ public class CardService {
 		Card card = entityManager.find(Card.class, cardId);
 		if (card != null) {
 			card.setAssignedToId(userId);
+            //messagingService.sendMessage("Card assigned to user: " + userId);
 			return "Card assigned successfully";
 		}
 		return "Card not found";
@@ -76,6 +83,7 @@ public class CardService {
         Card card = entityManager.find(Card.class, cardId);
 		if (card != null) {
 			card.getComments().add(comment);
+            //messagingService.sendMessage("New comment added to card: " + card.getName());
 			return "Comment added successfully";
 		}
 		return "Card not found";
@@ -96,23 +104,23 @@ public class CardService {
 		return card;
 	}
 	
-	// delete a card.
-//	public String deleteCard(Long cardId) {
-//		Card card = entityManager.find(Card.class, cardId);
-//		ListofCards list = entityManager.find(ListofCards.class, card.getListofcards().getListId());
-//		Board board = entityManager.find(Board.class, list.getBoard().getBoardId());
-//		Boolean isTeamLeader = false;
-//		if (board.getTeamLeaderId() == card.getAssignedToId()) {
-//			isTeamLeader = true;
-//		}
-//		
-//		if (card != null && isTeamLeader) {
-//			entityManager.remove(card);
-//			return "Card deleted successfully";
-//		}
-//		if (isTeamLeader) {
-//			return "insufficient permissions";
-//		}
-//		return "Card not found";
-//	}
+	 //delete a card.
+	public String deleteCard(Long cardId) {
+		Card card = entityManager.find(Card.class, cardId);
+		ListofCards list = entityManager.find(ListofCards.class, card.getListofcards().getListId());
+		Board board = entityManager.find(Board.class, list.getBoard().getBoardId());
+		Boolean isTeamLeader = false;
+		if (board.getTeamLeaderId() == card.getAssignedToId()) {
+			isTeamLeader = true;
+		}
+		
+		if (card != null && isTeamLeader) {
+			entityManager.remove(card);
+			return "Card deleted successfully";
+		}
+		if (isTeamLeader) {
+			return "insufficient permissions";
+		}
+		return "Card not found";
+	}
 }
