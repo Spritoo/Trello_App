@@ -1,12 +1,11 @@
 package service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import model.Board;
 import model.Card;
@@ -16,111 +15,178 @@ import model.ListofCards;
 public class CardService {
 	@PersistenceContext
 	private EntityManager entityManager;
-	
-	
+
+	@Inject
+	private BoardService boardService;
+
 //	@Inject
 //	private MessagingSystemService messagingService;
-	
-	//create a new card.
-	public String createCard(Card card, Long userId) {
-		Card checkCard = entityManager.find(Card.class, card.getCardId());
-		ListofCards list = entityManager.find(ListofCards.class, card.getListofcards().getListId());
+
+	// create a new card by passing Card and userId and listId.
+	public Response createCard(Card card, Long userId, Long listId) {
+		ListofCards list = entityManager.find(ListofCards.class, listId);
+		if (list == null) {
+			return Response.status(Status.NOT_FOUND).entity("List not found").build();
+		}
 		Board board = entityManager.find(Board.class, list.getBoard().getBoardId());
-		Boolean isMember = false;
-		for (Long memberId : board.getMembersIds()) {
-			if (memberId == userId) {
-				isMember = true;
-				break;
-			}
+		if (board == null) {
+			return Response.status(Status.NOT_FOUND).entity("Board not found").build();
 		}
-		if (checkCard != null) {
-			return "Card already exists";
-		}
+		Boolean isMember = boardService.isMemberOfBoard(board.getBoardId(), userId);
 		if (!isMember) {
-			return "User is not a member of the board";
+			return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
 		}
 		entityManager.persist(card);
-        //messagingService.sendMessage("New card created: " + card.getName());
-		return "Card created successfully";
-		
-	}
-	
-	// move cards between lists.
-	public String moveCard(Long cardId, Long listId) {
-		Card card = entityManager.find(Card.class, cardId);
-		ListofCards list = entityManager.find(ListofCards.class, listId);
-		if (card != null && list != null) {
-			card.setListofcards(list);
-			return "Card moved successfully";
-		}
-		return "Card or list not found";
-	}
-	
-	// assign cards to themselves or other collaborators.
-	public String assignCard(Long cardId, Long userId) {
-		Card card = entityManager.find(Card.class, cardId);
-		if (card != null) {
-			card.setAssignedToId(userId);
-            //messagingService.sendMessage("Card assigned to user: " + userId);
-			return "Card assigned successfully";
-		}
-		return "Card not found";
+		list.getCards().add(card);
+		return Response.ok(card).build();
 	}
 
-	// add descriptions to cards.
-	
-	public String addDescription(Long cardId, String description) {
+	// move cards between lists.
+	public Response moveCard(Long cardId, Long listId, Long userId) {
 		Card card = entityManager.find(Card.class, cardId);
-		if (card != null) {
-			card.setDescription(description);
-			return "Description added successfully";
+		if (card == null) {
+			return Response.status(Status.NOT_FOUND).entity("Card not found").build();
 		}
-		return "Card not found";
-	}
-	
-	// add comments to cards.
-	public String addComment(Long cardId, String comment) {
-        Card card = entityManager.find(Card.class, cardId);
-		if (card != null) {
-			card.getComments().add(comment);
-            //messagingService.sendMessage("New comment added to card: " + card.getName());
-			return "Comment added successfully";
+		ListofCards list = entityManager.find(ListofCards.class, listId);
+		if (list == null) {
+			return Response.status(Status.NOT_FOUND).entity("List not found").build();
 		}
-		return "Card not found";
-	}
-	
-	// get all comments of a card.
-	public List<String> getComments(Long cardId) {
-        Card card = entityManager.find(Card.class, cardId);
-		if (card != null) {
-			return card.getComments();
+		Board board = entityManager.find(Board.class, list.getBoard().getBoardId());
+		if (board == null) {
+			return Response.status(Status.NOT_FOUND).entity("Board not found").build();
 		}
-		return new ArrayList<>();
+		Boolean isMember = boardService.isMemberOfBoard(board.getBoardId(), userId);
+		if (!isMember) {
+			return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
+		}
+		card.getListofcards().getCards().remove(card);
+		card.setListofcards(list);
+		list.getCards().add(card);
+		return Response.ok(card).build();
 	}
-	
-	//get card details.
-	public Card getCard(Long cardId) {
+
+	// assign cards to themselves or other collaborators.
+	public Response assignCard(Long cardId, Long userId, Long assignedToId) {
 		Card card = entityManager.find(Card.class, cardId);
-		return card;
-	}
-	
-	 //delete a card.
-	public String deleteCard(Long cardId) {
-		Card card = entityManager.find(Card.class, cardId);
+		if (card == null) {
+			return Response.status(Status.NOT_FOUND).entity("Card not found").build();
+		}
+
 		ListofCards list = entityManager.find(ListofCards.class, card.getListofcards().getListId());
 		Board board = entityManager.find(Board.class, list.getBoard().getBoardId());
-		Boolean isTeamLeader = false;
-		if (board.getTeamLeaderId() == card.getAssignedToId()) {
-			isTeamLeader = true;
+		if (board == null) {
+			return Response.status(Status.NOT_FOUND).entity("Board not found").build();
 		}
-		
-		if (card != null && isTeamLeader) {
-			entityManager.remove(card);
-			return "Card deleted successfully";
+		Boolean isMember = boardService.isMemberOfBoard(board.getBoardId(), userId);
+		if (!isMember) {
+			return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
 		}
-		if (isTeamLeader) {
-			return "insufficient permissions";
+		if (assignedToId != userId) {
+			Boolean isAssignedToMember = boardService.isMemberOfBoard(board.getBoardId(), assignedToId);
+			if (!isAssignedToMember) {
+				return Response.status(Status.UNAUTHORIZED).entity("Assigned User  is not a member of the board")
+						.build();
+			}
 		}
-		return "Card not found";
+
+		card.setAssignedToId(assignedToId);
+		return Response.ok(card).build();
+
+	}
+
+	// add descriptions to cards using cardId. and userId.
+	public Response addDescription(Long cardId, Long userId, String description) {
+		Card card = entityManager.find(Card.class, cardId);
+		if (card == null) {
+			return Response.status(Status.NOT_FOUND).entity("Card not found").build();
+		}
+		ListofCards list = entityManager.find(ListofCards.class, card.getListofcards().getListId());
+		Board board = entityManager.find(Board.class, list.getBoard().getBoardId());
+		if (board == null) {
+			return Response.status(Status.NOT_FOUND).entity("Board not found").build();
+		}
+		Boolean isMember = boardService.isMemberOfBoard(board.getBoardId(), userId);
+		if (!isMember) {
+			return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
+		}
+		card.setDescription(description);
+		return Response.ok(card).build();
+	}
+
+	// add comments to cards using cardId. and userId.
+	public Response addComment(Long cardId, Long userId, String comment) {
+		Card card = entityManager.find(Card.class, cardId);
+		if (card == null) {
+			return Response.status(Status.NOT_FOUND).entity("Card not found").build();
+
+		}
+		ListofCards list = entityManager.find(ListofCards.class, card.getListofcards().getListId());
+		Board board = entityManager.find(Board.class, list.getBoard().getBoardId());
+		if (board == null) {
+			return Response.status(Status.NOT_FOUND).entity("Board not found").build();
+
+		}
+		Boolean isMember = boardService.isMemberOfBoard(board.getBoardId(), userId);
+		if (!isMember) {
+			return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
+		}
+		card.getComments().add(comment);
+		return Response.ok(card).build();
+	}
+
+	// get all comments of a card.
+	public Response getComments(Long cardId, Long userId) {
+		Card card = entityManager.find(Card.class, cardId);
+		if (card == null) {
+			return Response.status(Status.NOT_FOUND).entity("Card not found").build();
+		}
+		ListofCards list = entityManager.find(ListofCards.class, card.getListofcards().getListId());
+		Board board = entityManager.find(Board.class, list.getBoard().getBoardId());
+		if (board == null) {
+			return Response.status(Status.NOT_FOUND).entity("Board not found").build();
+		}
+		Boolean isMember = boardService.isMemberOfBoard(board.getBoardId(), userId);
+		if (!isMember) {
+			return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
+		}
+		return Response.ok(card.getComments()).build();
+	}
+
+	// get card details.
+	public Response getCard(Long cardId, Long userId) {
+		Card card = entityManager.find(Card.class, cardId);
+		if (card == null) {
+			return Response.status(Status.NOT_FOUND).entity("Card not found").build();
+		}
+		ListofCards list = entityManager.find(ListofCards.class, card.getListofcards().getListId());
+		Board board = entityManager.find(Board.class, list.getBoard().getBoardId());
+		if (board == null) {
+			return Response.status(Status.NOT_FOUND).entity("Board not found").build();
+		}
+		Boolean isMember = boardService.isMemberOfBoard(board.getBoardId(), userId);
+		if (!isMember) {
+			return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
+		}
+		return Response.ok(card).build();
+	}
+
+	// delete a card.
+	public Response deleteCard(Long cardId, Long userId) {
+		Card card = entityManager.find(Card.class, cardId);
+		if (card == null) {
+			return Response.status(Status.NOT_FOUND).entity("Card not found").build();
+		}
+		ListofCards list = entityManager.find(ListofCards.class, card.getListofcards().getListId());
+		Board board = entityManager.find(Board.class, list.getBoard().getBoardId());
+		if (board == null) {
+			return Response.status(Status.NOT_FOUND).entity("Board not found").build();
+		}
+		Boolean isMember = boardService.isMemberOfBoard(board.getBoardId(), userId);
+		if (!isMember) {
+			return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
+		}
+		list.getCards().remove(card);
+		entityManager.remove(card);
+		return Response.ok().build();
 	}
 }

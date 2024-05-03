@@ -39,36 +39,10 @@ public class UserController {
 	}
     
     
-//    @POST
-//    @Path("/login")
-//    public Response loginUser(User user) {
-//        String loginStatus = userService.loginUser(user);
-//        return Response.ok(loginStatus).build();
-//    }
-//    
-//    @GET
-//    @Path("/{id}")
-//    public Response getUserById(@PathParam("id") Long userId) {
-//        User user = userService.getUserById(userId);
-//        if (user != null) {
-//            return Response.ok(user).build();
-//        } else {
-//            return Response.status(Response.Status.NOT_FOUND).build();
-//        }
-//    }
-//
-//    @PUT
-//    @Path("/{id}")
-//    public Response updateUser(@PathParam("id") Long userId, User updatedUser) {
-//        updatedUser.setUserId(userId);
-//        userService.updateUser(updatedUser);
-//        return Response.ok(updatedUser).build();
-//    }
-//
-//    @DELETE
-//    @Path("/{id}")
-//    public Response deleteUser(@PathParam("id") Long userId) {
-//        userService.deleteUser(userId);
-//        return Response.noContent().build();
-//    }
+    @POST
+    @Path("/login")
+    public Response loginUser(User user) {
+        String loginStatus = userService.loginUser(user);
+        return Response.ok(loginStatus).build();
+    }
 }

@@ -6,82 +6,63 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.ws.rs.core.Response;
 
+import model.Board;
 import model.Card;
 import model.ListofCards;
+import model.User;
 
 @Stateless
 public class ListService {
 	@PersistenceContext
 	private EntityManager entityManager;
-	
+
 //	@Inject
 //    private MessagingSystemService messagingService;
-	
-	public String createList(ListofCards list) {
-		ListofCards checkList = entityManager.find(ListofCards.class, list.getListId());
-		if (checkList != null) {
-			return "List already exists";
+
+	// create lists within a board to categorize tasks.
+	public Response createList(ListofCards list, Long boardId, Long userId) {
+		Board board = entityManager.find(Board.class, boardId);
+		if (board == null) {
+			return Response.status(Response.Status.NOT_FOUND).entity("Board not found").build();
+		}
+		// check if user exists
+		User user = entityManager.find(User.class, userId);
+		if (user == null) {
+			return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
+		}
+		// check if user is a member of the board
+		if (!board.getContributors().contains(user)) {
+			return Response.status(Response.Status.UNAUTHORIZED).entity("User is not a member of the board").build();
 		}
 		entityManager.persist(list);
-        //messagingService.sendMessage("New list created: " + list.getName());
+		board.getLists().add(list);
+		return Response.ok(list).build();
+	}
 
-		return "List created successfully";
-	}
-	
-	public String updateList(ListofCards updatedList) {
-		ListofCards list = entityManager.find(ListofCards.class, updatedList.getListId());
-		if (list != null) {
-			entityManager.merge(updatedList);
-            //messagingService.sendMessage("List updated: " + list.getName());
-			return "List updated successfully";
+	// delete list from board using user id
+	public Response deleteList(Long listId, Long boardId, Long userId) {
+		Board board = entityManager.find(Board.class, boardId);
+		if (board == null) {
+			return Response.status(Response.Status.NOT_FOUND).entity("Board not found").build();
 		}
-		return "List not found";
-	}
-	
-	public String deleteList(Long listId) {
-		ListofCards list = entityManager.find(ListofCards.class, listId);
-		if (list != null) {
-			entityManager.remove(list);
-            //messagingService.sendMessage("List deleted: " + list.getName());
-			return "List deleted successfully";
+		// check if user exists
+		User user = entityManager.find(User.class, userId);
+		if (user == null) {
+			return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
 		}
-		return "List not found";
-	}
-	
-	public String addCardToList(Long listId, Long cardId) {
-		ListofCards list = entityManager.find(ListofCards.class, listId);
-		Card card = entityManager.find(Card.class, cardId);
-		if (list != null) {
-			list.getCards().add(card);
-            //messagingService.sendMessage("Card added to list: " + list.getName());
-			return "Card added to list successfully";
+		// check if user is a member of the board
+		if (!board.getContributors().contains(user)) {
+			return Response.status(Response.Status.UNAUTHORIZED).entity("User is not a member of the board").build();
 		}
-		return "List not found";
-	}
-	
-	public String removeCardFromList(Long listId, Long cardId) {
 		ListofCards list = entityManager.find(ListofCards.class, listId);
-		Card card = entityManager.find(Card.class, cardId);
-		if (list != null) {
-			list.getCards().remove(card);
-            //messagingService.sendMessage("Card removed from list: " + list.getName());
-			return "Card removed from list successfully";
+		if (list == null) {
+			return Response.status(Response.Status.NOT_FOUND).entity("List not found").build();
 		}
-		return "List not found";
+		board.getLists().remove(list);
+		entityManager.remove(list);
+		return Response.ok().build();
 	}
-	
-	
-	public ListofCards getList(Long listId) {
-		ListofCards list = entityManager.find(ListofCards.class, listId);
-		return list;
-	}
-	
-	
-	public Set<Card> getCards(Long listId) {
-		ListofCards list = entityManager.find(ListofCards.class, listId);
-		return list.getCards();
-	}
-	
 
 }

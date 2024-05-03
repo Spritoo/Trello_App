@@ -23,37 +23,37 @@ import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Table(name = "Board", uniqueConstraints = @UniqueConstraint(columnNames = {"name"}))
+@Table(name = "Board", uniqueConstraints = @UniqueConstraint(columnNames = { "name" }))
 public class Board {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long boardId;
-	
+
 	@NotNull
 	@Column(name = "name")
 	String name;
-	
-	//team leader is the user who created the board
+
+	// team leader is the user who created the board
 	@NotNull
 	@ManyToOne
-    @JoinColumn(name = "team_leader_id")
+	@JoinColumn(name = "team_leader_id")
 	@JsonIgnore
-    private User teamLeader;
-	
-	@OneToMany(mappedBy = "board",cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private User teamLeader;
+
+	@OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private Set<ListofCards> lists;
-	
-	//members are the users who are part of the board
+
+	// members are the users who are part of the board
 	@ManyToMany(mappedBy = "contributedBoards")
 	@JsonIgnore
-    private Set<User> contributors = new HashSet<>();
-	 
+	private Set<User> contributors = new HashSet<>();
+
 	@ElementCollection(fetch = FetchType.EAGER)
 	private Set<Long> membersIds = new HashSet<>();
-	
+
 	private long teamLeaderId;
-	
+
 	public Board() {
 		super();
 	}
@@ -63,12 +63,12 @@ public class Board {
 		this.boardId = boardId;
 		this.name = name;
 	}
-	
+
 	public void setTeamLeader(User teamLeader) {
 		this.teamLeader = teamLeader;
 		teamLeaderId = teamLeader.getUserId();
 	}
-	
+
 	public void setContributers(Set<User> contributors) {
 		this.contributors = contributors;
 		for (User user : contributors) {
@@ -83,45 +83,42 @@ public class Board {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public long getBoardId() {
 		return boardId;
 	}
-	
+
 	public void setBoardId(long boardId) {
 		this.boardId = boardId;
 	}
-	
+
 	public User getTeamLeader() {
 		return teamLeader;
 	}
-	
+
 	public Set<User> getContributors() {
 		return contributors;
 	}
-	
+
 	public Set<Long> getMembersIds() {
 		return membersIds;
 	}
-	
+
 	public long getTeamLeaderId() {
 		return teamLeaderId;
 	}
-	
+
 	public void addMember(User user) {
 		contributors.add(user);
 		membersIds.add(user.getUserId());
 	}
-	
+
 	public Set<ListofCards> getLists() {
 		return lists;
 	}
-	
+
 	public void setLists(Set<ListofCards> lists) {
 		this.lists = lists;
 	}
-	
-	
-	
-	
+
 }
