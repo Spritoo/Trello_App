@@ -24,7 +24,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "User", uniqueConstraints = @UniqueConstraint(columnNames = { "email" }))
-public class User {
+public class User implements java.io.Serializable{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

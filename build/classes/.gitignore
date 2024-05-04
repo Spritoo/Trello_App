@@ -1,7 +1,5 @@
-/.DS_Store
-/META-INF/
-/Service.class
-/controller/
-/model/
 /service/
 /util/
+/model/
+/WEB-INF/
+/controller/

@@ -18,17 +18,16 @@ public class BoardController {
 	private BoardService boardService;
 
 	@POST
-	@Path("/create/{userId}")
-	public Response createBoard(Board board, @PathParam("userId") Long userId) {
+	@Path("/create")
+	public Response createBoard(@QueryParam("boardName") String board, @QueryParam("userId") Long userId) {
 		Response response = boardService.createBoard(board, userId);
 		return response;
 	}
 
 	@PUT
-	@Path("/inviteMember/{userId}/{boardId}/{teamLeaderId}")
-	public Response inviteUser(@PathParam("userId") Long userId, @PathParam("boardId") Long boardId,
-			@PathParam("teamLeaderId") Long teamLeaderId) {
-		Response response = boardService.inviteMember(boardId, userId, teamLeaderId);
+    @Path("/inviteMember")
+	public Response inviteUser(@QueryParam("userId") Long userId, @QueryParam("boardId") Long boardId) {
+		Response response = boardService.inviteMember(boardId, userId);
 		return response;
 	}
 
@@ -40,15 +39,15 @@ public class BoardController {
 	}
 
 	@GET
-	@Path("/getBoardsByTeamLeader/{teamLeaderId}")
-	public Response getBoardsByTeamLeader(@PathParam("teamLeaderId") Long teamLeaderId) {
-		Response response = boardService.getBoardByTeamLeaderId(teamLeaderId);
+	@Path("/getBoardsAsLeader")
+	public Response getBoardsByTeamLeader(@QueryParam("teamLeaderId") long teamLeaderId) {
+		Response response = boardService.getMyBoardsAsLeader(teamLeaderId);
 		return response;
 	}
 
 	@DELETE
-	@Path("/deleteBoard/{teamLeaderId}/{boardId}")
-	public Response deleteBoard(@PathParam("teamLeaderId") Long teamLeaderId, @PathParam("boardId") Long boardId) {
+	@Path("/deleteBoard")
+	public Response deleteBoard(@QueryParam("teamLeaderId") long teamLeaderId, @QueryParam("boardId") long boardId) {
 		Response response = boardService.deleteBoardByTeamLeaderId(teamLeaderId, boardId);
 		return response;
 	}

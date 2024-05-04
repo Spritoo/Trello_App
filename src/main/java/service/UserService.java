@@ -25,11 +25,6 @@ public class UserService {
 //    private LoginSession loginSession;
 
 	public Response createUser(User user) {
-		try {
-			entityManager.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class)
-					.setParameter("email", user.getEmail()).getSingleResult();
-			return Response.status(Response.Status.CONFLICT).entity("User with this email already exists").build();
-		} catch (NoResultException e) {
 			// check if email is valid
 			if (!EmailValidator.isValid(user.getEmail()) || user.getEmail().isEmpty()) {
 				return Response.status(Response.Status.BAD_REQUEST).entity("Invalid email").build();
@@ -42,7 +37,9 @@ public class UserService {
 				return Response.status(Response.Status.BAD_REQUEST).entity("Password must be at least 8 characters")
 						.build();
 			}
-			entityManager.persist(user);
+			try {
+				entityManager.persist(user);
+				// Create and send Event
 			// Create and send Event
 //            String eventId = "1"; // You can generate this dynamically
 //            String eventName = "User Created";
@@ -52,16 +49,18 @@ public class UserService {
 //
 //            messagingSystemService.sendEvent(event); // Modify your MessagingSystemService accordingly
 
-			return Response.status(Response.Status.CREATED).entity("User created").build();
+			return Response.status(Response.Status.CREATED).entity("User created with id: " + user.getUserId()).build();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error creating user").build();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error creating user, user with same email").build();
 		}
 	}
 
 	public Response getUsers() {
-		List<User> users = entityManager.createQuery("SELECT u FROM User u", User.class).getResultList();
-		return Response.ok(users).build();
+		
+		//return all users by entity manager;
+		return Response.ok().entity(entityManager.createQuery("SELECT u FROM User u", User.class).getResultList()).build();
+		
 	}
 	
 	
@@ -69,8 +68,13 @@ public class UserService {
 	public Response updateUser(User user) {
 		User updatedUser = entityManager.find(User.class, user.getUserId());
 		if (updatedUser != null) {
-			entityManager.merge(user);
-			return Response.status(Response.Status.CREATED).entity("User updated successfully").build();
+			try {
+				entityManager.merge(user);
+				return Response.status(Response.Status.CREATED).entity("User updated successfully").build();
+			} catch (Exception e) {
+				e.printStackTrace();
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error updating user").build();
+			}
 		}
 		return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
 	}

@@ -1,5 +1,6 @@
 package controller;
 
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -15,6 +16,7 @@ import service.UserService;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @Stateless
+@PermitAll
 public class UserController {
     @EJB
     private UserService userService;
@@ -32,7 +34,8 @@ public class UserController {
 		return users;
 	}
     
-    @POST
+    @PUT
+    @Path("/update")
 	public Response updateUser(User user) {
 		Response updatedUser = userService.updateUser(user);
 		return updatedUser;

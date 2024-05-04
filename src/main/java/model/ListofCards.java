@@ -17,7 +17,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="List")
-public class ListofCards{
+public class ListofCards implements java.io.Serializable{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
