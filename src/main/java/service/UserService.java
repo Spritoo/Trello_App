@@ -10,7 +10,6 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.ws.rs.core.Response;
 
-
 import model.User;
 import util.EmailValidator;
 
@@ -18,7 +17,7 @@ import util.EmailValidator;
 public class UserService {
 	@PersistenceContext
 	private EntityManager entityManager;
-
+//
 //    @Inject
 //    private MessagingSystemService messagingService;
 
@@ -44,6 +43,14 @@ public class UserService {
 						.build();
 			}
 			entityManager.persist(user);
+			// Create and send Event
+//            String eventId = "1"; // You can generate this dynamically
+//            String eventName = "User Created";
+//            String eventDescription = "New user created: " + user.getUsername();
+//            long eventTimestamp = System.currentTimeMillis(); // Current time
+//            Event event = new Event(eventId, eventName, eventDescription, eventTimestamp);
+//
+//            messagingSystemService.sendEvent(event); // Modify your MessagingSystemService accordingly
 
 			return Response.status(Response.Status.CREATED).entity("User created").build();
 		} catch (Exception e) {
