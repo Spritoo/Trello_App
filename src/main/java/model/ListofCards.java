@@ -33,9 +33,9 @@ public class ListofCards implements java.io.Serializable{
 	private Set<Card> cards;
 
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "boardId")
-	@JsonIgnore
-	private Board board;
+    @JoinColumn(name = "boardId")
+    @JsonIgnore
+    private Board board;
 	
 	public ListofCards(long listId, String name) {
 		super();

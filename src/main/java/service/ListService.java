@@ -19,32 +19,30 @@ public class ListService {
 	@PersistenceContext
 	private EntityManager entityManager;
 
-//	@Inject
-//    private MessagingSystemService messagingService;
 
-	// create lists within a board to categorize tasks.
-	// Assuming you have a method to create a new ListofCards and associate it with a Board
-	public Response createList(String listName, Long boardId , Long userId) {
-	    Board board = entityManager.find(Board.class, boardId);
-	    if (board == null) {
-	    	return Response.status(Response.Status.NOT_FOUND).entity("Board not found with id: ").build();
-	    }
-	    User user = entityManager.find(User.class, userId);
-		if (user == null) {
-			return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
-		}
-		// check if user is a member of the board
-		if (!board.getContributors().contains(user)) {
-					return Response.status(Response.Status.UNAUTHORIZED).entity("User is not a member of the board").build();
-		}
-	    ListofCards newList = new ListofCards(listName);
-	    newList.setBoard(board); // Set the board for the new list
-	    entityManager.persist(newList); // Persist the new list
-	    // Add the new list to the board's list of cards
-	    board.getLists().add(newList);
-
-	    return Response.ok(newList).build();
+	public Response createList(String listName, long boardId, long teamLeaderId) {
+        // check if board exists
+        Board board = entityManager.find(Board.class, boardId);
+        if (board == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Board not found").build();
+        }
+        // check if user exists
+        User user = entityManager.find(User.class, teamLeaderId);
+        if (user == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
+        }
+        // check if user is a teamLeader of the board
+        if (!board.getTeamLeader().equals(user)) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User is not a team leader of the board")
+                    .build();
+        }
+        ListofCards list = new ListofCards();
+        list.setName(listName);
+        list.setBoard(board);
+        entityManager.persist(list);
+        return Response.ok("List created successfully").build();
 	}
+	
 
 
 	// delete list from board using user id

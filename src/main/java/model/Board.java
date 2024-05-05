@@ -42,17 +42,18 @@ public class Board implements java.io.Serializable{
 	@JsonIgnore
 	private User teamLeader;
 
-	@OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private Set<ListofCards> lists;
+
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<ListofCards> lists;
 
 	// members are the users who are part of the board
+	@JsonIgnore
 	@ManyToMany( fetch = FetchType.EAGER)
     @JoinTable(
             name = "BoardMember",
             joinColumns = @JoinColumn(name = "boardID"),
             inverseJoinColumns = @JoinColumn(name = "userID")
     )
-    @JsonIgnore
 	private Set<User> contributors;
 
 	@ElementCollection(fetch = FetchType.EAGER)
