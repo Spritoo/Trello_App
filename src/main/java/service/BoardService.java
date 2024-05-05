@@ -113,5 +113,18 @@ public class BoardService {
 		return Response.status(Response.Status.NOT_FOUND).entity("Board not found").build();
 
 	}
+	
+	public boolean isMemberOfBoard(Long boardId, Long userId) {
+		Board board = entityManager.find(Board.class, boardId);
+		if (board != null) {
+			if (board.getMembersIds().contains(userId)) {
+				return true;
+			} else if (board.getTeamLeader().getUserId() == userId) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 
 }
