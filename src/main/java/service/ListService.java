@@ -32,9 +32,8 @@ public class ListService {
 		if (user == null) {
 			return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
 		}
-		// check if user is a member of the board
-		if (!board.getContributors().contains(user)) {
-			return Response.status(Response.Status.UNAUTHORIZED).entity("User is not a member of the board").build();
+		if (!board.getTeamLeader().equals(user)) {
+			return Response.status(Response.Status.UNAUTHORIZED).entity("User is not leader of the board").build();
 		}
 		entityManager.persist(list);
 		board.getLists().add(list);
@@ -42,14 +41,14 @@ public class ListService {
 	}
 
 	// delete list from board using user id
-	public Response deleteList(Long listId, Long userId) {
+	public Response deleteList(Long listId, Long teamLeaderId) {
 		// check if list exists
 		ListofCards list = entityManager.find(ListofCards.class, listId);
 		if (list == null) {
 			return Response.status(Response.Status.NOT_FOUND).entity("List not found").build();
 		}
 		// check if user exists
-		User user = entityManager.find(User.class, userId);
+		User user = entityManager.find(User.class, teamLeaderId);
 		if (user == null) {
 			return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
 		}

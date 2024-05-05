@@ -51,5 +51,13 @@ public class BoardController {
 		Response response = boardService.deleteBoardByTeamLeaderId(teamLeaderId, boardId);
 		return response;
 	}
+	
+	//getcontributers of board
+	@GET
+	@Path("/getContributers")
+	public Response getContributers(@QueryParam("boardId") long boardId) {
+		Response response = boardService.getContributers(boardId);
+		return response;
+	}
 
 }

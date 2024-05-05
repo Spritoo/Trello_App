@@ -77,7 +77,7 @@ public class BoardService {
 			return Response.status(Response.Status.CONFLICT).entity("User is already a member").build();
 		}
 		try {
-		board.addMember(member);
+		board.addContributer(member);
 		entityManager.merge(board);
 		return Response.status(Response.Status.CREATED).entity("User invited successfully").build();
 	} catch (Exception e) {
@@ -127,5 +127,14 @@ public class BoardService {
 		return false;
 	}
 
+	//get contributers
+	public Response getContributers(long boardId) {
+		Board board = entityManager.find(Board.class, boardId);
+		if (board != null) {
+			Set<User> contributors = board.getContributors();
+			return Response.ok(contributors).build();
+		}
+		return Response.status(Response.Status.NOT_FOUND).entity("Board not found").build();
+	}
 
 }

@@ -13,6 +13,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -45,9 +46,14 @@ public class Board implements java.io.Serializable{
 	private Set<ListofCards> lists;
 
 	// members are the users who are part of the board
-	@ManyToMany(mappedBy = "contributedBoards")
-	@JsonIgnore
-	private Set<User> contributors = new HashSet<>();
+	@ManyToMany( fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "BoardMember",
+            joinColumns = @JoinColumn(name = "boardID"),
+            inverseJoinColumns = @JoinColumn(name = "userID")
+    )
+    @JsonIgnore
+	private Set<User> contributors;
 
 	@ElementCollection(fetch = FetchType.EAGER)
 	private Set<Long> membersIds = new HashSet<>();
@@ -75,7 +81,7 @@ public class Board implements java.io.Serializable{
 			membersIds.add(user.getUserId());
 		}
 	}
-
+	
 	public String getName() {
 		return name;
 	}
@@ -107,11 +113,12 @@ public class Board implements java.io.Serializable{
 	public long getTeamLeaderId() {
 		return teamLeaderId;
 	}
-
-	public void addMember(User user) {
-		contributors.add(user);
-		membersIds.add(user.getUserId());
+	
+	public void addContributer(User contributor) {
+	    contributors.add(contributor);
+	    membersIds.add(contributor.getUserId());
 	}
+	
 
 	public Set<ListofCards> getLists() {
 		return lists;

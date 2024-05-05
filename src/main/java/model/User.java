@@ -3,6 +3,7 @@ package model;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -47,13 +48,12 @@ public class User implements java.io.Serializable{
 	// if the user is a team leader
 	@JsonIgnore
 	@OneToMany(mappedBy = "teamLeader")
-	private Set<Board> boardsAsLeader = new HashSet<>();
+	private Set<Board> boardsAsLeader;
 
 	// if the user is a contributer
 	@JsonIgnore
-	@ManyToMany
-	@JoinTable(name = "user_contributions", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "board_id"))
-	private Set<User> contributedBoards = new HashSet<>();
+	@ManyToMany(mappedBy = "contributors")
+	private Set<User> contributedBoards;
 
 	public User() {
 		super();

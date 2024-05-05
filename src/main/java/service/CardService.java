@@ -38,6 +38,7 @@ public class CardService {
 		}
 		entityManager.persist(card);
 		list.getCards().add(card);
+		entityManager.merge(list);
 		return Response.ok(card).build();
 	}
 
@@ -62,6 +63,7 @@ public class CardService {
 		card.getListofcards().getCards().remove(card);
 		card.setListofcards(list);
 		list.getCards().add(card);
+		entityManager.merge(card);
 		return Response.ok(card).build();
 	}
 
@@ -90,6 +92,7 @@ public class CardService {
 		}
 
 		card.setAssignedToId(assignedToId);
+		entityManager.merge(card);
 		return Response.ok(card).build();
 
 	}
@@ -110,6 +113,7 @@ public class CardService {
 			return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
 		}
 		card.setDescription(description);
+		entityManager.merge(card);
 		return Response.ok(card).build();
 	}
 
@@ -131,6 +135,7 @@ public class CardService {
 			return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
 		}
 		card.getComments().add(comment);
+		entityManager.merge(card);
 		return Response.ok(card).build();
 	}
 
