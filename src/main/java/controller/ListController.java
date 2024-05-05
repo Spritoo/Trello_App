@@ -16,14 +16,14 @@ public class ListController {
 	private ListService listService;
 
 	@POST
-	@Path("/createList/{boardId}/{userId}")
-	public Response createList(ListofCards list, @PathParam("boardId") Long boardId, @PathParam("userId") Long userId) {
+	@Path("/createList")
+	public Response createList(ListofCards list, @QueryParam("boardId") Long boardId, @QueryParam("userId") Long userId) {
 		return listService.createList(list, boardId, userId);
 	}
 
 	@DELETE
-	@Path("/deleteList/{listId}/{boardId}/{userId}")
-	public Response deleteList(@PathParam("listId") Long listId, @PathParam("boardId") Long boardId,
+	@Path("/deleteList")
+	public Response deleteList(@QueryParam("listId") Long listId, @QueryParam("boardId") Long boardId,
 			@PathParam("userId") Long userId) {
 		return listService.deleteList(listId,  userId);
 	}
