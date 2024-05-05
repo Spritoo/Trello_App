@@ -25,7 +25,7 @@ public class ListController {
 	@Path("/deleteList/{listId}/{boardId}/{userId}")
 	public Response deleteList(@PathParam("listId") Long listId, @PathParam("boardId") Long boardId,
 			@PathParam("userId") Long userId) {
-		return listService.deleteList(listId, boardId, userId);
+		return listService.deleteList(listId,  userId);
 	}
 
 }

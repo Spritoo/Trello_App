@@ -42,27 +42,25 @@ public class ListService {
 	}
 
 	// delete list from board using user id
-	public Response deleteList(Long listId, Long boardId, Long userId) {
-		Board board = entityManager.find(Board.class, boardId);
-		if (board == null) {
-			return Response.status(Response.Status.NOT_FOUND).entity("Board not found").build();
+	public Response deleteList(Long listId, Long userId) {
+		// check if list exists
+		ListofCards list = entityManager.find(ListofCards.class, listId);
+		if (list == null) {
+			return Response.status(Response.Status.NOT_FOUND).entity("List not found").build();
 		}
 		// check if user exists
 		User user = entityManager.find(User.class, userId);
 		if (user == null) {
 			return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
 		}
-		// check if user is a member of the board
-		if (!board.getContributors().contains(user)) {
-			return Response.status(Response.Status.UNAUTHORIZED).entity("User is not a member of the board").build();
+		// check if user is a teamLeader of the board
+		Board board = list.getBoard();
+		if (!board.getTeamLeader().equals(user)) {
+			return Response.status(Response.Status.UNAUTHORIZED).entity("User is not a team leader of the board")
+					.build();
 		}
-		ListofCards list = entityManager.find(ListofCards.class, listId);
-		if (list == null) {
-			return Response.status(Response.Status.NOT_FOUND).entity("List not found").build();
-		}
-		board.getLists().remove(list);
 		entityManager.remove(list);
-		return Response.ok().build();
+		return Response.ok("List deleted successfully").build();
 	}
 
 }

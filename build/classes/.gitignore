@@ -1,5 +1,3 @@
-/service/
-/util/
-/model/
-/WEB-INF/
 /controller/
+/model/
+/service/
