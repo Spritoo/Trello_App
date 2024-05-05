@@ -78,6 +78,7 @@ public class BoardService {
 		}
 		try {
 		board.addMember(member);
+		entityManager.merge(board);
 		return Response.status(Response.Status.CREATED).entity("User invited successfully").build();
 	} catch (Exception e) {
 		e.printStackTrace();
