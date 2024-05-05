@@ -26,8 +26,8 @@ public class BoardController {
 
 	@PUT
     @Path("/inviteMember")
-	public Response inviteUser(@QueryParam("userId") Long userId, @QueryParam("boardId") Long boardId) {
-		Response response = boardService.inviteMember(boardId, userId);
+	public Response inviteUser(@QueryParam("userId") Long userId, @QueryParam("boardId") Long boardId, @QueryParam("teamLeaderId") Long teamLeaderId) {
+		Response response = boardService.inviteMember(boardId, userId, teamLeaderId);
 		return response;
 	}
 

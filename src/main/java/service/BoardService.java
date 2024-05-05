@@ -53,14 +53,23 @@ public class BoardService {
 	}
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public Response inviteMember(long boardId, long memberId) {
+	public Response inviteMember(long boardId, long memberId, long teamLeaderId) {
 		
 		Board board = entityManager.find(Board.class, boardId);
 		if (board == null) {
 			return Response.status(Response.Status.NOT_FOUND).entity("Board not found").build();
 		}
-		User user = entityManager.find(User.class, memberId);
-		if (user == null) {
+		User leader = entityManager.find(User.class, teamLeaderId);
+		if (leader == null) {
+			return Response.status(Response.Status.NOT_FOUND).entity("Leader not found").build();
+			
+		}
+		if (board.getTeamLeader() != leader ) {
+			return Response.status(Response.Status.UNAUTHORIZED).entity("User is not a team leader of the board")
+					.build();
+		}
+		User member = entityManager.find(User.class, memberId);
+		if (member == null) {
 			return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
 		}
 		
@@ -68,7 +77,7 @@ public class BoardService {
 			return Response.status(Response.Status.CONFLICT).entity("User is already a member").build();
 		}
 		try {
-		board.addMember(user);
+		board.addMember(member);
 		return Response.status(Response.Status.CREATED).entity("User invited successfully").build();
 	} catch (Exception e) {
 		e.printStackTrace();
