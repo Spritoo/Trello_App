@@ -17,8 +17,9 @@ public class ListController {
 
 	@POST
 	@Path("/createList")
-	public Response createList(ListofCards list, @QueryParam("boardId") Long boardId, @QueryParam("userId") Long userId) {
-		return listService.createList(list, boardId, userId);
+	public Response createList(@QueryParam("boardId") Long boardId, @QueryParam("listName") String listName,
+			@PathParam("userId") Long userId) {
+		return listService.createList(listName, boardId, userId);
 	}
 
 	@DELETE

@@ -21,7 +21,7 @@ public class Card implements java.io.Serializable{
     @Column(name = "description")
     private String description;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "listId")
     private ListofCards listofcards;
 
