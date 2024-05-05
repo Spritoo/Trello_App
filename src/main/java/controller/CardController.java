@@ -19,32 +19,32 @@ public class CardController {
 
 	// create cards within a list to represent individual tasks.
 	@POST
-	@Path("/create/{listId}/{userId}")
-	public Response createCard(Card card, @PathParam("userId") Long userId, @PathParam("listId") Long listId) {
+	@Path("/create")
+	public Response createCard(Card card, @QueryParam("userId") Long userId, @QueryParam("listId") Long listId) {
 		return cardService.createCard(card, userId, listId);
 	}
 
 	// add descriptions
 	@PUT
-	@Path("/description/{cardId}/{userId}")
-	public Response addDescription(@PathParam("cardId") Long cardId, @QueryParam("description") String description,
+	@Path("/description")
+	public Response addDescription(@QueryParam("cardId") Long cardId, @QueryParam("description") String description,
 			@PathParam("userId") Long userId) {
 		return cardService.addDescription(cardId, userId, description);
 	}
 
 	// add comments
 	@PUT
-	@Path("/comment/{cardId}/{userId}")
-	public Response addComment(@PathParam("cardId") Long cardId, @QueryParam("comment") String comment,
+	@Path("/comment")
+	public Response addComment(@QueryParam("cardId") Long cardId, @QueryParam("comment") String comment,
 			@PathParam("userId") Long userId) {
 		return cardService.addComment(cardId, userId, comment);
 	}
 
 	// assign cards to themselves or other collaborators.
 	@PUT
-	@Path("/assign/{cardId}/{userId}/{assignedToId}")
-	public Response assignCard(@PathParam("cardId") Long cardId, @PathParam("userId") Long userId,
-			@PathParam("assignedToId") Long assignedToId) {
+	@Path("/assign")
+	public Response assignCard(@QueryParam("cardId") Long cardId, @QueryParam("userId") Long userId,
+			@QueryParam("assignedToId") Long assignedToId) {
 		return cardService.assignCard(cardId, userId, assignedToId);
 	}
 
@@ -58,8 +58,8 @@ public class CardController {
 
 	// get card details
 	@GET
-	@Path("/details/{cardId}/{userId}")
-	public Response getCardDetails(@PathParam("cardId") Long cardId, @PathParam("userId") Long userId) {
+	@Path("/details")
+	public Response getCardDetails(@QueryParam("cardId") Long cardId, @QueryParam("userId") Long userId) {
 		return cardService.getCard(cardId, userId);
 	}
 

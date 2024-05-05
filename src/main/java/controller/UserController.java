@@ -33,7 +33,7 @@ public class UserController {
     	Response users = userService.getUsers();
 		return users;
 	}
-    
+   
     @PUT
     @Path("/update")
 	public Response updateUser(User user) {
