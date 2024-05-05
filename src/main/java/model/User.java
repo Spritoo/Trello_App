@@ -53,7 +53,7 @@ public class User implements java.io.Serializable{
 	// if the user is a contributer
 	@JsonIgnore
 	@ManyToMany(mappedBy = "contributors")
-	private Set<User> contributedBoards;
+	private Set<Board> contributedBoards;
 
 	public User() {
 		super();
@@ -116,11 +116,11 @@ public class User implements java.io.Serializable{
 		this.boardsAsLeader = boardsAsLeader;
 	}
 
-	public Set<User> getContributedBoards() {
+	public Set<Board> getContributedBoards() {
 		return contributedBoards;
 	}
 
-	public void setContributedBoards(Set<User> contributedBoards) {
+	public void setContributedBoards(Set<Board> contributedBoards) {
 		this.contributedBoards = contributedBoards;
 	}
 
