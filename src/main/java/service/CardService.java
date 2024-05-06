@@ -194,6 +194,24 @@ public class CardService {
 		return Response.ok(card).build();
 	}
 
+	// get all cards in a list.
+	public Response getCards(Long listId, Long userId) {
+		ListofCards list = entityManager.find(ListofCards.class, listId);
+		if (list == null) {
+			return Response.status(Status.NOT_FOUND).entity("List not found").build();
+		}
+		Board board = entityManager.find(Board.class, list.getBoard().getBoardId());
+		if (board == null) {
+			return Response.status(Status.NOT_FOUND).entity("Board not found").build();
+		}
+		Boolean isMember = board.getMembersIds().contains(userId);
+		if (!isMember && board.getTeamLeaderId() != userId) {
+			return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
+		}
+		messageClient.sendMessage("Cards fetched for list " + list.getName() + " in board " + board.getName());
+		return Response.ok(list.getCards()).build();
+	}
+	
 	// delete a card.
 	public Response deleteCard(Long cardId, Long userId) {
 		Card card = entityManager.find(Card.class, cardId);

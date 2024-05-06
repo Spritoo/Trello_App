@@ -1,9 +1,3 @@
-/.DS_Store
-/META-INF/
-/Service.class
-/WEB-INF/
-/controller/
-/messagingSystem/
-/model/
 /service/
-/util/
+/model/
+/controller/

@@ -1,10 +1,12 @@
 package service;
 
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.ws.rs.core.Response;
 
+import messagingSystem.client;
 import model.Board;
 import model.ListofCards;
 import model.Sprint;
@@ -13,6 +15,9 @@ import model.Sprint;
 public class SprintService {
 	@PersistenceContext
 	private EntityManager entityManager;
+	
+	@Inject
+	private client messageClient;
 	
 	public Response endSprint(long bloardId) {
 		//Check board done list make a new sprint appending to report string the done tasks with their importance and deleting them from done list
@@ -25,27 +30,26 @@ public class SprintService {
 		sprint.setBoard(board);
 		try {
 		sprint.setBoard(entityManager.find(Board.class, bloardId));
-		sprint.setReport("Sprint report for board: "+ board.getName() );
-		sprint.appendReport("Done tasks: ");
+		sprint.setReport("Sprint report for board: "+ board.getName() + "\n\n" );
+		sprint.appendReport("Done tasks:\n");
 		
 		try {
-		board.getDoneList().getCards().forEach(card -> {
-			sprint.appendReport(card.ParseCard());
+		board.DoneList().getCards().forEach(card -> {
+			sprint.appendReport(card.ParseCard() + "\n");
 			entityManager.remove(card);
-			entityManager.find(ListofCards.class, board.getDoneList().getListId()).getCards().remove(card);
+			entityManager.find(ListofCards.class, board.DoneList().getListId()).getCards().remove(card);
 			entityManager.flush();
 		});
-		
-		sprint.appendReport("Tasks in progress: ");
-		board.getInProgressList().getCards().forEach(card -> {
-			sprint.appendReport(card.ParseCard() );
+		sprint.appendReport("\n\nTasks in progress:");
+		board.InProgressList().getCards().forEach(card -> {
+			sprint.appendReport("\n" + card.ParseCard() );
 		});
 		
-		sprint.appendReport("Tasks to do:");
-		board.getToDoList().getCards().forEach(card -> {
-			sprint.appendReport(card.ParseCard());
+		sprint.appendReport("\nTasks to do:\n");
+		board.ToDoList().getCards().forEach(card -> {
+		sprint.appendReport(card.ParseCard() + "\n");
 		});
-		
+		messageClient.sendMessage("Sprint ended for board " + board.getName());
 		entityManager.persist(sprint);
 	} catch (Exception e) {
 		e.printStackTrace();
@@ -66,6 +70,7 @@ public class SprintService {
 		if (sprint == null) {
 			return Response.status(Response.Status.NOT_FOUND).entity("Sprint not found").build();
 		}
+		messageClient.sendMessage("Sprint retrieved with id " + sprint.getId());
 		return Response.ok(sprint).build();
 	}
 	

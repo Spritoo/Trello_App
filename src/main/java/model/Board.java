@@ -132,7 +132,7 @@ public class Board implements java.io.Serializable{
 		this.lists = lists;
 	}
 	
-	public ListofCards getDoneList() {
+	public ListofCards DoneList() {
 		for (ListofCards list : lists) {
 			if (list.getName().equals("Done")) {
 				return list;
@@ -141,7 +141,7 @@ public class Board implements java.io.Serializable{
 		return null;
 	}
 	
-	public ListofCards getInProgressList() {
+	public ListofCards InProgressList() {
 		for (ListofCards list : lists) {
 			if (list.getName().equals("In Progress")) {
 				return list;
@@ -150,7 +150,7 @@ public class Board implements java.io.Serializable{
 		return null;
 	}
 	
-	public ListofCards getToDoList() {
+	public ListofCards ToDoList() {
 		for (ListofCards list : lists) {
 			if (list.getName().equals("To Do")) {
 				return list;

@@ -62,5 +62,12 @@ public class CardController {
 	public Response getCardDetails(@QueryParam("cardId") Long cardId, @QueryParam("userId") Long userId) {
 		return cardService.getCard(cardId, userId);
 	}
+	
+	// get all cards in a list
+	@GET
+	@Path("/all")
+	public Response getAllCards(@QueryParam("listId") Long listId, @QueryParam("userId") Long userId) {
+		return cardService.getCards(listId, userId);
+	}
 
 }
