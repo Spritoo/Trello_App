@@ -28,7 +28,7 @@ public class CardController {
 	@PUT
 	@Path("/description")
 	public Response addDescription(@QueryParam("cardId") Long cardId, @QueryParam("description") String description,
-			@PathParam("userId") Long userId) {
+			@QueryParam("userId") Long userId) {
 		return cardService.addDescription(cardId, userId, description);
 	}
 
@@ -36,7 +36,7 @@ public class CardController {
 	@PUT
 	@Path("/comment")
 	public Response addComment(@QueryParam("cardId") Long cardId, @QueryParam("comment") String comment,
-			@PathParam("userId") Long userId) {
+			@QueryParam("userId") Long userId) {
 		return cardService.addComment(cardId, userId, comment);
 	}
 

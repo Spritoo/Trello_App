@@ -1,6 +1,9 @@
 package model;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,15 +24,13 @@ public class Card implements java.io.Serializable{
     @Column(name = "description")
     private String description;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "listId")
+    @JsonIgnore
     private ListofCards listofcards;
 
-    @ManyToOne
-    @JoinColumn(name = "userId")
-    private User user;
     
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<String> comments = new ArrayList<>();
 
     public Card() {

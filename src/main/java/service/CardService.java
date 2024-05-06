@@ -1,5 +1,7 @@
 package service;
 
+import java.util.Set;
+
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -24,23 +26,37 @@ public class CardService {
 
 	// create a new card by passing Card and userId and listId.
 	public Response createCard(Card card, Long userId, Long listId) {
-		ListofCards list = entityManager.find(ListofCards.class, listId);
-		if (list == null) {
-			return Response.status(Status.NOT_FOUND).entity("List not found").build();
-		}
-		Board board = entityManager.find(Board.class, list.getBoard().getBoardId());
-		if (board == null) {
-			return Response.status(Status.NOT_FOUND).entity("Board not found").build();
-		}
-		Boolean isMember = boardService.isMemberOfBoard(board.getBoardId(), userId);
-		if (!isMember) {
-			return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
-		}
-		entityManager.persist(card);
-		list.getCards().add(card);
-		entityManager.merge(list);
-		return Response.ok(card).build();
+	    ListofCards list = entityManager.find(ListofCards.class, listId);
+	    if (list == null) {
+	        return Response.status(Status.NOT_FOUND).entity("List not found").build();
+	    }
+
+	    Board board = entityManager.find(Board.class, list.getBoard().getBoardId());
+	    if (board == null) {
+	        return Response.status(Status.NOT_FOUND).entity("Board not found").build();
+	    }
+
+	    Boolean isMember = board.getMembersIds().contains(userId);
+		if (!isMember && board.getTeamLeaderId() != userId) {
+	        return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
+	    }
+
+	    // Create a new Card entity and set its properties
+	    Card newCard = new Card();
+	    newCard.setName(card.getName());
+	    newCard.setAssignedToId(userId);
+	    newCard.setDescription(card.getDescription());
+	    newCard.setComments(card.getComments());
+	    newCard.setListofcards(list);
+
+	    entityManager.persist(newCard); // Persist the new card
+	    list.getCards().add(newCard); // Add the new card to the list
+
+	    entityManager.merge(list); // Update the list in the database
+
+	    return Response.ok(newCard).build(); // Return the new card in the response
 	}
+
 
 	// move cards between lists.
 	public Response moveCard(Long cardId, Long listId, Long userId) {
@@ -56,8 +72,8 @@ public class CardService {
 		if (board == null) {
 			return Response.status(Status.NOT_FOUND).entity("Board not found").build();
 		}
-		Boolean isMember = boardService.isMemberOfBoard(board.getBoardId(), userId);
-		if (!isMember) {
+		Boolean isMember = board.getMembersIds().contains(userId);
+		if (!isMember && board.getTeamLeaderId() != userId) {
 			return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
 		}
 		card.getListofcards().getCards().remove(card);
@@ -79,17 +95,13 @@ public class CardService {
 		if (board == null) {
 			return Response.status(Status.NOT_FOUND).entity("Board not found").build();
 		}
-		Boolean isMember = boardService.isMemberOfBoard(board.getBoardId(), userId);
-		if (!isMember) {
+		Boolean isMember = board.getMembersIds().contains(userId);
+		if (!isMember && board.getTeamLeaderId() != userId) {
 			return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
 		}
-		if (assignedToId != userId) {
-			Boolean isAssignedToMember = boardService.isMemberOfBoard(board.getBoardId(), assignedToId);
-			if (!isAssignedToMember) {
-				return Response.status(Status.UNAUTHORIZED).entity("Assigned User  is not a member of the board")
-						.build();
-			}
-		}
+		if (assignedToId != userId && !board.getMembersIds().contains(assignedToId)) {
+            return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
+        }
 
 		card.setAssignedToId(assignedToId);
 		entityManager.merge(card);
@@ -108,8 +120,8 @@ public class CardService {
 		if (board == null) {
 			return Response.status(Status.NOT_FOUND).entity("Board not found").build();
 		}
-		Boolean isMember = boardService.isMemberOfBoard(board.getBoardId(), userId);
-		if (!isMember) {
+		Boolean isMember = board.getMembersIds().contains(userId);
+		if (!isMember && board.getTeamLeaderId() != userId) {
 			return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
 		}
 		card.setDescription(description);
@@ -130,8 +142,8 @@ public class CardService {
 			return Response.status(Status.NOT_FOUND).entity("Board not found").build();
 
 		}
-		Boolean isMember = boardService.isMemberOfBoard(board.getBoardId(), userId);
-		if (!isMember) {
+		Boolean isMember = board.getMembersIds().contains(userId);
+		if (!isMember && board.getTeamLeaderId() != userId) {
 			return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
 		}
 		card.getComments().add(comment);
@@ -150,8 +162,8 @@ public class CardService {
 		if (board == null) {
 			return Response.status(Status.NOT_FOUND).entity("Board not found").build();
 		}
-		Boolean isMember = boardService.isMemberOfBoard(board.getBoardId(), userId);
-		if (!isMember) {
+		Boolean isMember = board.getMembersIds().contains(userId);
+		if (!isMember && board.getTeamLeaderId() != userId) {
 			return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
 		}
 		return Response.ok(card.getComments()).build();
@@ -168,8 +180,8 @@ public class CardService {
 		if (board == null) {
 			return Response.status(Status.NOT_FOUND).entity("Board not found").build();
 		}
-		Boolean isMember = boardService.isMemberOfBoard(board.getBoardId(), userId);
-		if (!isMember) {
+		Boolean isMember = board.getMembersIds().contains(userId);
+		if (!isMember && board.getTeamLeaderId() != userId) {
 			return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
 		}
 		return Response.ok(card).build();
@@ -186,8 +198,8 @@ public class CardService {
 		if (board == null) {
 			return Response.status(Status.NOT_FOUND).entity("Board not found").build();
 		}
-		Boolean isMember = boardService.isMemberOfBoard(board.getBoardId(), userId);
-		if (!isMember) {
+		Boolean isMember = board.getMembersIds().contains(userId);
+		if (!isMember && board.getTeamLeaderId() != userId) {
 			return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
 		}
 		list.getCards().remove(card);

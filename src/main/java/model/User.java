@@ -54,6 +54,8 @@ public class User implements java.io.Serializable{
 	@JsonIgnore
 	@ManyToMany(mappedBy = "contributors")
 	private Set<Board> contributedBoards;
+	
+
 
 	public User() {
 		super();

@@ -43,7 +43,7 @@ public class Board implements java.io.Serializable{
 	private User teamLeader;
 
 
-    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.EAGER , orphanRemoval = true)
     private Set<ListofCards> lists;
 
 	// members are the users who are part of the board

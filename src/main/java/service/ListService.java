@@ -40,7 +40,7 @@ public class ListService {
         list.setName(listName);
         list.setBoard(board);
         entityManager.persist(list);
-        return Response.ok("List created successfully").build();
+        return Response.ok(list).build();
 	}
 	
 
@@ -64,7 +64,26 @@ public class ListService {
 					.build();
 		}
 		entityManager.remove(list);
+		entityManager.find(Board.class, board.getBoardId()).getLists().remove(list);
+		entityManager.flush();
 		return Response.ok("List deleted successfully").build();
+	}
+	
+	public Response getLists(Long boardId, Long userId) {
+		Board board = entityManager.find(Board.class, boardId);
+		if (board == null) {
+			return Response.status(Response.Status.NOT_FOUND).entity("Board not found").build();
+		}
+		User user = entityManager.find(User.class, userId);
+		if (user == null) {
+			return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
+		}
+		Boolean isMember = board.getContributors().contains(user);
+		if (!isMember && !board.getTeamLeader().equals(user)) {
+			return Response.status(Response.Status.UNAUTHORIZED).entity("User is not a member of the board").build();
+		}
+		Set<ListofCards> lists = board.getLists();
+		return Response.ok(lists).build();
 	}
 
 }

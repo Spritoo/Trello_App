@@ -25,8 +25,14 @@ public class ListController {
 	@DELETE
 	@Path("/deleteList")
 	public Response deleteList(@QueryParam("listId") Long listId, @QueryParam("boardId") Long boardId,
-			@PathParam("userId") Long userId) {
+			@QueryParam("userId") Long userId) {
 		return listService.deleteList(listId,  userId);
+	}
+	
+	@GET
+	@Path("/getLists")
+	public Response getLists(@QueryParam("boardId") Long boardId, @QueryParam("userId") Long userId) {
+		return listService.getLists(boardId, userId);
 	}
 
 }
