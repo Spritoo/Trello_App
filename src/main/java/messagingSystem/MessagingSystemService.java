@@ -24,10 +24,10 @@ public class MessagingSystemService implements MessageListener {
     public void onMessage(Message message) {
           try {
                 if (message instanceof TextMessage) {
-                    System.out.println("Received message: " + ((TextMessage) message).getText());
+                    System.out.println("Received message ( " + ((TextMessage) message).getText() + " )");
                 } else if (message instanceof ObjectMessage) {
                     Serializable object = ((ObjectMessage) message).getObject();
-                    System.out.println("Received message: " + object);
+                    System.out.println("Received message ( " + object + " )");
                 }
             } catch (JMSException e) {
                 e.printStackTrace();

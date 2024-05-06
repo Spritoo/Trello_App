@@ -9,6 +9,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.persistence.PersistenceContext;
 import javax.ws.rs.core.Response;
 
+import messagingSystem.client;
 import model.Board;
 import model.Card;
 import model.ListofCards;
@@ -19,6 +20,8 @@ public class ListService {
 	@PersistenceContext
 	private EntityManager entityManager;
 
+	@Inject
+	private client messageClient; 
 
 	public Response createList(String listName, long boardId, long teamLeaderId) {
         // check if board exists
@@ -40,6 +43,7 @@ public class ListService {
         list.setName(listName);
         list.setBoard(board);
         entityManager.persist(list);
+        messageClient.sendMessage("List created " + listName + " in board " + board.getName());
         return Response.ok(list).build();
 	}
 	
@@ -66,6 +70,7 @@ public class ListService {
 		entityManager.remove(list);
 		entityManager.find(Board.class, board.getBoardId()).getLists().remove(list);
 		entityManager.flush();
+		messageClient.sendMessage("List deleted " + list.getName());
 		return Response.ok("List deleted successfully").build();
 	}
 	
@@ -83,6 +88,7 @@ public class ListService {
 			return Response.status(Response.Status.UNAUTHORIZED).entity("User is not a member of the board").build();
 		}
 		Set<ListofCards> lists = board.getLists();
+		messageClient.sendMessage("Lists retrieved");
 		return Response.ok(lists).build();
 	}
 

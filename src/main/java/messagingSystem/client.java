@@ -26,7 +26,7 @@ public class client {
 		JMSProducer producer = context.createProducer();
 		producer.send((Destination)notificationQueue, message);
 		System.out.println("***************************************");
-		System.out.println("Sent message: " + message);
+		System.out.println("Sent message ( " + message + " )");
 		System.out.println("***************************************");
 
 	}

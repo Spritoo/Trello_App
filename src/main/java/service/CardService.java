@@ -9,6 +9,7 @@ import javax.persistence.PersistenceContext;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import messagingSystem.client;
 import model.Board;
 import model.Card;
 import model.ListofCards;
@@ -21,8 +22,8 @@ public class CardService {
 	@Inject
 	private BoardService boardService;
 
-//	@Inject
-//	private MessagingSystemService messagingService;
+	@Inject
+	private client messageClient;
 
 	// create a new card by passing Card and userId and listId.
 	public Response createCard(Card card, Long userId, Long listId) {
@@ -53,7 +54,7 @@ public class CardService {
 	    list.getCards().add(newCard); // Add the new card to the list
 
 	    entityManager.merge(list); // Update the list in the database
-
+	    messageClient.sendMessage("Card created" + newCard.getName() + " in list " + list.getName() + " in board " + board.getName());
 	    return Response.ok(newCard).build(); // Return the new card in the response
 	}
 
@@ -80,6 +81,7 @@ public class CardService {
 		card.setListofcards(list);
 		list.getCards().add(card);
 		entityManager.merge(card);
+		messageClient.sendMessage("Card moved to list " + list.getName() + " in board " + board.getName());
 		return Response.ok(card).build();
 	}
 
@@ -105,6 +107,7 @@ public class CardService {
 
 		card.setAssignedToId(assignedToId);
 		entityManager.merge(card);
+		messageClient.sendMessage("Card assigned to " + assignedToId + " in list " + list.getName() + " in board " + board.getName());
 		return Response.ok(card).build();
 
 	}
@@ -126,6 +129,7 @@ public class CardService {
 		}
 		card.setDescription(description);
 		entityManager.merge(card);
+		messageClient.sendMessage("Description added to card " + card.getName() + " in list " + list.getName() + " in board " + board.getName());
 		return Response.ok(card).build();
 	}
 
@@ -148,6 +152,7 @@ public class CardService {
 		}
 		card.getComments().add(comment);
 		entityManager.merge(card);
+		messageClient.sendMessage("Comment added to card " + card.getName() + " in list " + list.getName() + " in board " + board.getName());
 		return Response.ok(card).build();
 	}
 
@@ -166,6 +171,7 @@ public class CardService {
 		if (!isMember && board.getTeamLeaderId() != userId) {
 			return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
 		}
+		messageClient.sendMessage("Comments fetched for card " + card.getName() + " in list " + list.getName() + " in board " + board.getName());
 		return Response.ok(card.getComments()).build();
 	}
 
@@ -184,6 +190,7 @@ public class CardService {
 		if (!isMember && board.getTeamLeaderId() != userId) {
 			return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
 		}
+		messageClient.sendMessage("Card fetched " + card.getName() + " in list " + list.getName() + " in board " + board.getName());
 		return Response.ok(card).build();
 	}
 
@@ -204,6 +211,7 @@ public class CardService {
 		}
 		list.getCards().remove(card);
 		entityManager.remove(card);
+		messageClient.sendMessage("Card deleted " + card.getName() + " in list " + list.getName() + " in board " + board.getName());
 		return Response.ok().build();
 	}
 }

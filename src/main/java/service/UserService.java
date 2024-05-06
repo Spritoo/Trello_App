@@ -54,6 +54,7 @@ public class UserService {
 	public Response getUsers() {
 		
 		//return all users by entity manager;
+		messageClient.sendMessage("Getting all users");
 		return Response.ok().entity(entityManager.createQuery("SELECT u FROM User u", User.class).getResultList()).build();
 		
 	}
@@ -64,6 +65,7 @@ public class UserService {
 		User updatedUser = entityManager.find(User.class, user.getUserId());
 		if (updatedUser != null) {
 			try {
+				messageClient.sendMessage("User updated: " + user.getUsername());
 				entityManager.merge(user);
 				return Response.status(Response.Status.CREATED).entity("User updated successfully").build();
 			} catch (Exception e) {
@@ -80,6 +82,7 @@ public class UserService {
 				.setParameter("email", loginUser.getEmail()).setParameter("password", loginUser.getPassword())
 				.getSingleResult();
 		if (user != null) {
+			messageClient.sendMessage("User logged in: " + user.getUsername());
 			return "User logged in successfully";
 		}
 		return "User not found";
@@ -105,13 +108,14 @@ public class UserService {
 				.setParameter("userId", userId).getSingleResult();
 		if (user != null) {
 			entityManager.remove(user);
-			// messagingService.sendMessage("User deleted: " + user.getUsername());
+			messageClient.sendMessage("User deleted: " + user.getUsername());
 			return "User deleted successfully";
 		}
 		return "User not found";
 	}
 
 	public User getUserById(Long userId) {
+		messageClient.sendMessage("Getting user by id: " + userId);
 		return entityManager.createQuery("SELECT u FROM User u WHERE u.userId = :userId", User.class)
 				.setParameter("userId", userId).getSingleResult();
 	}

@@ -6,10 +6,12 @@ import java.util.Set;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.ws.rs.core.Response;
 
+import messagingSystem.client;
 import model.Board;
 import model.ListofCards;
 import model.User;
@@ -20,8 +22,8 @@ public class BoardService {
 	@PersistenceContext
 	private EntityManager entityManager;
 
-//	@Inject
-//  private MessagingSystemService messagingService;
+	@Inject
+	private client messageClient;
 
 //	@Inject
 //	private LoginSession loginSession;
@@ -42,13 +44,14 @@ public class BoardService {
 				e.printStackTrace();
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error creating board").build();
 			}
-			// messagingService.sendMessage("New board created: " + board.getName());
+			messageClient.sendMessage("New board created: " + name);
 			return Response.status(Response.Status.CREATED).entity("Board created successfully").build();
 		}
 	}
 
 	public Response getBoards() {
 		List<Board> boards = entityManager.createQuery("SELECT b FROM Board b", Board.class).getResultList();
+		messageClient.sendMessage("Boards retrieved");
 		return Response.ok(boards).build();
 	}
 
@@ -79,6 +82,7 @@ public class BoardService {
 		try {
 		board.addContributer(member);
 		entityManager.merge(board);
+		messageClient.sendMessage("User invited to board: " + member.getUsername());
 		return Response.status(Response.Status.CREATED).entity("User invited successfully").build();
 	} catch (Exception e) {
 		e.printStackTrace();
@@ -92,6 +96,7 @@ public class BoardService {
 		List<Board> boards = entityManager
 				.createQuery("SELECT b FROM Board b WHERE b.teamLeader.userId = :teamLeaderId", Board.class)
 				.setParameter("teamLeaderId", teamLeaderId).getResultList();
+		messageClient.sendMessage("Boards retrieved");
 		return Response.ok(boards).build();
 	} catch (Exception e) {
 		e.printStackTrace();
@@ -107,6 +112,7 @@ public class BoardService {
 		if (board != null && leader != null) {
 			if (board.getTeamLeader() == leader) {
 				entityManager.remove(board);
+				messageClient.sendMessage("Board deleted" + board.getName());
 				return Response.status(Response.Status.OK).entity("Board deleted successfully").build();
 			}
 			return Response.status(Response.Status.CONFLICT).entity("User is not a team leader of the board").build();
@@ -132,6 +138,7 @@ public class BoardService {
 		Board board = entityManager.find(Board.class, boardId);
 		if (board != null) {
 			Set<User> contributors = board.getContributors();
+			messageClient.sendMessage("Contributors retrieved");
 			return Response.ok(contributors).build();
 		}
 		return Response.status(Response.Status.NOT_FOUND).entity("Board not found").build();
