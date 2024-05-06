@@ -24,11 +24,13 @@ public class Card implements java.io.Serializable{
     @Column(name = "description")
     private String description;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER )
     @JoinColumn(name = "listId")
     @JsonIgnore
     private ListofCards listofcards;
-
+    
+    @Column(name = "importance")
+    private long importance;
     
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> comments = new ArrayList<>();
@@ -89,4 +91,9 @@ public class Card implements java.io.Serializable{
     public void setComments(List<String> comments) {
         this.comments = comments;
     }
+    
+	public String ParseCard() {
+		return "Card [cardId=" + cardId + ", name=" + name + ", assignedToId=" + assignedToId + ", description="
+				+ description + ", importance=" + importance + ", comments=" + comments + "]";
+	}
 }

@@ -29,7 +29,7 @@ public class ListofCards implements java.io.Serializable{
 	@Column(name = "name")
 	private String name;
 	
-	@OneToMany(mappedBy = "listofcards",cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "listofcards",cascade = CascadeType.ALL,fetch = FetchType.EAGER , orphanRemoval = true)
 	private Set<Card> cards;
 
 	@ManyToOne(fetch = FetchType.EAGER)

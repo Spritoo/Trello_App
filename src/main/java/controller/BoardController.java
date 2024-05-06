@@ -8,6 +8,7 @@ import model.Board;
 import model.ListofCards;
 import model.User;
 import service.BoardService;
+import service.ListService;
 
 @Path("/board")
 @Produces(MediaType.APPLICATION_JSON)
@@ -16,11 +17,15 @@ public class BoardController {
 
 	@EJB
 	private BoardService boardService;
+	
+	@EJB
+	private ListService listService;
 
 	@POST
 	@Path("/create")
 	public Response createBoard(@QueryParam("boardName") String board, @QueryParam("userId") Long userId) {
 		Response response = boardService.createBoard(board, userId);
+		
 		return response;
 	}
 

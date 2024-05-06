@@ -3,6 +3,7 @@ package service;
 import java.util.List;
 import java.util.Set;
 
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
@@ -24,6 +25,10 @@ public class BoardService {
 
 	@Inject
 	private client messageClient;
+	
+	@EJB
+	private ListService listService;
+
 
 //	@Inject
 //	private LoginSession loginSession;
@@ -40,11 +45,16 @@ public class BoardService {
 				board.setName(name);
 				board.setTeamLeader(user);
 				entityManager.persist(board);
+				Board dbBoard = entityManager.find(Board.class, board.getBoardId());
+				listService.createList("To Do", dbBoard.getBoardId(), userId);
+				listService.createList("In Progress", dbBoard.getBoardId(), userId);
+				listService.createList("Done", dbBoard.getBoardId(), userId);
 			} catch (Exception e) {
 				e.printStackTrace();
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error creating board").build();
 			}
 			messageClient.sendMessage("New board created: " + name);
+			
 			return Response.status(Response.Status.CREATED).entity("Board created successfully").build();
 		}
 	}

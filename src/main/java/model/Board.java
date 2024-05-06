@@ -60,6 +60,9 @@ public class Board implements java.io.Serializable{
 	private Set<Long> membersIds = new HashSet<>();
 
 	private long teamLeaderId;
+	
+	@OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.EAGER , orphanRemoval = true)
+    private Set<ListofCards> sprintLists;
 
 	public Board() {
 		super();
@@ -127,6 +130,33 @@ public class Board implements java.io.Serializable{
 
 	public void setLists(Set<ListofCards> lists) {
 		this.lists = lists;
+	}
+	
+	public ListofCards getDoneList() {
+		for (ListofCards list : lists) {
+			if (list.getName().equals("Done")) {
+				return list;
+			}
+		}
+		return null;
+	}
+	
+	public ListofCards getInProgressList() {
+		for (ListofCards list : lists) {
+			if (list.getName().equals("In Progress")) {
+				return list;
+			}
+		}
+		return null;
+	}
+	
+	public ListofCards getToDoList() {
+		for (ListofCards list : lists) {
+			if (list.getName().equals("To Do")) {
+				return list;
+			}
+		}
+		return null;
 	}
 
 }
