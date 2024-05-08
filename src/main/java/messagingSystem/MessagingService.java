@@ -18,13 +18,16 @@ import java.io.Serializable;
 @MessageDriven(name = "queue", activationConfig = {
         @ActivationConfigProperty(propertyName = "destinationLookup", propertyValue = "queue/DLQ"),
         @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue") })
-public class MessagingSystemService implements MessageListener {
+public class MessagingService implements MessageListener {
 
     @Override
     public void onMessage(Message message) {
           try {
                 if (message instanceof TextMessage) {
+            		System.out.println("_________________________________________");
                     System.out.println("Received message ( " + ((TextMessage) message).getText() + " )");
+            		System.out.println("_________________________________________");
+
                 } else if (message instanceof ObjectMessage) {
                     Serializable object = ((ObjectMessage) message).getObject();
                     System.out.println("Received message ( " + object + " )");

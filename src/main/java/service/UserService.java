@@ -10,7 +10,6 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.ws.rs.core.Response;
 
-import messagingSystem.MessagingSystemService;
 import messagingSystem.client;
 import model.User;
 import util.EmailValidator;

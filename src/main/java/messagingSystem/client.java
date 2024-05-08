@@ -17,22 +17,22 @@ import javax.jms.Queue;
 @Singleton
 public class client {
 	@Resource(mappedName = "java:/jms/queue/DLQ")
-	private Queue notificationQueue;
+	private Queue queueNatifaication;
 
 	@Inject
 	private JMSContext context;
 
 	public void sendMessage(String message) {
 		JMSProducer producer = context.createProducer();
-		producer.send((Destination)notificationQueue, message);
-		System.out.println("***************************************");
+		producer.send((Destination)queueNatifaication, message);
+		System.out.println("_________________________________________");
 		System.out.println("Sent message ( " + message + " )");
-		System.out.println("***************************************");
+		System.out.println("_________________________________________");
 
 	}
 
 	public String receiveMessage() {
-		JMSConsumer consumer = context.createConsumer(notificationQueue);
+		JMSConsumer consumer = context.createConsumer(queueNatifaication);
 		String message = consumer.receiveBody(String.class);
 		System.out.println("message recieved:"+message);
 		return message;
