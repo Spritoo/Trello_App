@@ -29,23 +29,26 @@ public class CardService {
 	public Response createCard(Card card, Long userId, Long listId) {
 	    ListofCards list = entityManager.find(ListofCards.class, listId);
 	    if (list == null) {
+	    	messageClient.sendMessage("List not found");
 	        return Response.status(Status.NOT_FOUND).entity("List not found").build();
 	    }
 
 	    Board board = entityManager.find(Board.class, list.getBoard().getBoardId());
 	    if (board == null) {
+	    	messageClient.sendMessage("Board not found");
 	        return Response.status(Status.NOT_FOUND).entity("Board not found").build();
 	    }
 
 	    Boolean isMember = board.getMembersIds().contains(userId);
 		if (!isMember && board.getTeamLeaderId() != userId) {
+			messageClient.sendMessage("User is not a member of the board");
 	        return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
 	    }
 
 	    // Create a new Card entity and set its properties
 	    Card newCard = new Card();
 	    newCard.setName(card.getName());
-	    newCard.setAssignedToId(userId);
+	    newCard.setAssignedToId(card.getAssignedToId());
 	    newCard.setDescription(card.getDescription());
 	    newCard.setComments(card.getComments());
 	    newCard.setListofcards(list);
@@ -63,18 +66,22 @@ public class CardService {
 	public Response moveCard(Long cardId, Long listId, Long userId) {
 		Card card = entityManager.find(Card.class, cardId);
 		if (card == null) {
+			messageClient.sendMessage("Card not found");
 			return Response.status(Status.NOT_FOUND).entity("Card not found").build();
 		}
 		ListofCards list = entityManager.find(ListofCards.class, listId);
 		if (list == null) {
+			messageClient.sendMessage("List not found");
 			return Response.status(Status.NOT_FOUND).entity("List not found").build();
 		}
 		Board board = entityManager.find(Board.class, list.getBoard().getBoardId());
 		if (board == null) {
+			messageClient.sendMessage("Board not found");
 			return Response.status(Status.NOT_FOUND).entity("Board not found").build();
 		}
 		Boolean isMember = board.getMembersIds().contains(userId);
 		if (!isMember && board.getTeamLeaderId() != userId) {
+			messageClient.sendMessage("User is not a member of the board");
 			return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
 		}
 		card.getListofcards().getCards().remove(card);
@@ -89,19 +96,23 @@ public class CardService {
 	public Response assignCard(Long cardId, Long userId, Long assignedToId) {
 		Card card = entityManager.find(Card.class, cardId);
 		if (card == null) {
+			messageClient.sendMessage("Card not found");
 			return Response.status(Status.NOT_FOUND).entity("Card not found").build();
 		}
 
 		ListofCards list = entityManager.find(ListofCards.class, card.getListofcards().getListId());
 		Board board = entityManager.find(Board.class, list.getBoard().getBoardId());
 		if (board == null) {
+			messageClient.sendMessage("Board not found");
 			return Response.status(Status.NOT_FOUND).entity("Board not found").build();
 		}
 		Boolean isMember = board.getMembersIds().contains(userId);
 		if (!isMember && board.getTeamLeaderId() != userId) {
+			messageClient.sendMessage("User is not a member of the board");
 			return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
 		}
 		if (assignedToId != userId && !board.getMembersIds().contains(assignedToId)) {
+			messageClient.sendMessage("User is not a member of the board");
             return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
         }
 
@@ -116,15 +127,18 @@ public class CardService {
 	public Response addDescription(Long cardId, Long userId, String description) {
 		Card card = entityManager.find(Card.class, cardId);
 		if (card == null) {
+			messageClient.sendMessage("Card not found");
 			return Response.status(Status.NOT_FOUND).entity("Card not found").build();
 		}
 		ListofCards list = entityManager.find(ListofCards.class, card.getListofcards().getListId());
 		Board board = entityManager.find(Board.class, list.getBoard().getBoardId());
 		if (board == null) {
+			messageClient.sendMessage("Board not found");
 			return Response.status(Status.NOT_FOUND).entity("Board not found").build();
 		}
 		Boolean isMember = board.getMembersIds().contains(userId);
 		if (!isMember && board.getTeamLeaderId() != userId) {
+			messageClient.sendMessage("User is not a member of the board");
 			return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
 		}
 		card.setDescription(description);
@@ -137,17 +151,20 @@ public class CardService {
 	public Response addComment(Long cardId, Long userId, String comment) {
 		Card card = entityManager.find(Card.class, cardId);
 		if (card == null) {
+			messageClient.sendMessage("Card not found");
 			return Response.status(Status.NOT_FOUND).entity("Card not found").build();
 
 		}
 		ListofCards list = entityManager.find(ListofCards.class, card.getListofcards().getListId());
 		Board board = entityManager.find(Board.class, list.getBoard().getBoardId());
 		if (board == null) {
+			messageClient.sendMessage("Board not found");
 			return Response.status(Status.NOT_FOUND).entity("Board not found").build();
 
 		}
 		Boolean isMember = board.getMembersIds().contains(userId);
 		if (!isMember && board.getTeamLeaderId() != userId) {
+			messageClient.sendMessage("User is not a member of the board");
 			return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
 		}
 		card.getComments().add(comment);
@@ -160,15 +177,18 @@ public class CardService {
 	public Response getComments(Long cardId, Long userId) {
 		Card card = entityManager.find(Card.class, cardId);
 		if (card == null) {
+			messageClient.sendMessage("Card not found");
 			return Response.status(Status.NOT_FOUND).entity("Card not found").build();
 		}
 		ListofCards list = entityManager.find(ListofCards.class, card.getListofcards().getListId());
 		Board board = entityManager.find(Board.class, list.getBoard().getBoardId());
 		if (board == null) {
+			messageClient.sendMessage("Board not found");
 			return Response.status(Status.NOT_FOUND).entity("Board not found").build();
 		}
 		Boolean isMember = board.getMembersIds().contains(userId);
 		if (!isMember && board.getTeamLeaderId() != userId) {
+			messageClient.sendMessage("User is not a member of the board");
 			return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
 		}
 		messageClient.sendMessage("Comments fetched for card " + card.getName() + " in list " + list.getName() + " in board " + board.getName());
@@ -179,15 +199,18 @@ public class CardService {
 	public Response getCard(Long cardId, Long userId) {
 		Card card = entityManager.find(Card.class, cardId);
 		if (card == null) {
+			messageClient.sendMessage("Card not found");
 			return Response.status(Status.NOT_FOUND).entity("Card not found").build();
 		}
 		ListofCards list = entityManager.find(ListofCards.class, card.getListofcards().getListId());
 		Board board = entityManager.find(Board.class, list.getBoard().getBoardId());
 		if (board == null) {
+			messageClient.sendMessage("Board not found");
 			return Response.status(Status.NOT_FOUND).entity("Board not found").build();
 		}
 		Boolean isMember = board.getMembersIds().contains(userId);
 		if (!isMember && board.getTeamLeaderId() != userId) {
+			messageClient.sendMessage("User is not a member of the board");
 			return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
 		}
 		messageClient.sendMessage("Card fetched " + card.getName() + " in list " + list.getName() + " in board " + board.getName());
@@ -198,14 +221,17 @@ public class CardService {
 	public Response getCards(Long listId, Long userId) {
 		ListofCards list = entityManager.find(ListofCards.class, listId);
 		if (list == null) {
+			messageClient.sendMessage("List not found");
 			return Response.status(Status.NOT_FOUND).entity("List not found").build();
 		}
 		Board board = entityManager.find(Board.class, list.getBoard().getBoardId());
 		if (board == null) {
+			messageClient.sendMessage("Board not found");
 			return Response.status(Status.NOT_FOUND).entity("Board not found").build();
 		}
 		Boolean isMember = board.getMembersIds().contains(userId);
 		if (!isMember && board.getTeamLeaderId() != userId) {
+			messageClient.sendMessage("User is not a member of the board");
 			return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
 		}
 		messageClient.sendMessage("Cards fetched for list " + list.getName() + " in board " + board.getName());
@@ -216,15 +242,18 @@ public class CardService {
 	public Response deleteCard(Long cardId, Long userId) {
 		Card card = entityManager.find(Card.class, cardId);
 		if (card == null) {
+			messageClient.sendMessage("Card not found");
 			return Response.status(Status.NOT_FOUND).entity("Card not found").build();
 		}
 		ListofCards list = entityManager.find(ListofCards.class, card.getListofcards().getListId());
 		Board board = entityManager.find(Board.class, list.getBoard().getBoardId());
 		if (board == null) {
+			messageClient.sendMessage("Board not found");
 			return Response.status(Status.NOT_FOUND).entity("Board not found").build();
 		}
 		Boolean isMember = board.getMembersIds().contains(userId);
 		if (!isMember && board.getTeamLeaderId() != userId) {
+			messageClient.sendMessage("User is not a member of the board");
 			return Response.status(Status.UNAUTHORIZED).entity("User is not a member of the board").build();
 		}
 		list.getCards().remove(card);

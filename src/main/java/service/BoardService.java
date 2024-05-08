@@ -38,8 +38,14 @@ public class BoardService {
 		
 		User user = entityManager.find(User.class, userId);
 		if (user == null) {
+			messageClient.sendMessage("User not found");
 			return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
-		} else {
+		}
+		if (user.isLeader() == false) {
+			messageClient.sendMessage("User is not a team leader");
+			return Response.status(Response.Status.UNAUTHORIZED).entity("User is not a team leader").build();
+		}
+		 else {
 			try {
 				Board board = new Board();
 				board.setName(name);
@@ -51,6 +57,7 @@ public class BoardService {
 				listService.createList("Done", dbBoard.getBoardId(), userId);
 			} catch (Exception e) {
 				e.printStackTrace();
+				messageClient.sendMessage("Error creating board");
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error creating board").build();
 			}
 			messageClient.sendMessage("New board created: " + name);
@@ -70,23 +77,28 @@ public class BoardService {
 		
 		Board board = entityManager.find(Board.class, boardId);
 		if (board == null) {
+			messageClient.sendMessage("Board not found");
 			return Response.status(Response.Status.NOT_FOUND).entity("Board not found").build();
 		}
 		User leader = entityManager.find(User.class, teamLeaderId);
 		if (leader == null) {
+			messageClient.sendMessage("Leader not found");
 			return Response.status(Response.Status.NOT_FOUND).entity("Leader not found").build();
 			
 		}
 		if (board.getTeamLeader() != leader ) {
+			messageClient.sendMessage("User is not a team leader of the board");
 			return Response.status(Response.Status.UNAUTHORIZED).entity("User is not a team leader of the board")
 					.build();
 		}
 		User member = entityManager.find(User.class, memberId);
 		if (member == null) {
+			messageClient.sendMessage("User not found");
 			return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
 		}
 		
 		if (board.getMembersIds().contains(memberId)) {
+			messageClient.sendMessage("User is already a member");
 			return Response.status(Response.Status.CONFLICT).entity("User is already a member").build();
 		}
 		try {
@@ -96,6 +108,7 @@ public class BoardService {
 		return Response.status(Response.Status.CREATED).entity("User invited successfully").build();
 	} catch (Exception e) {
 		e.printStackTrace();
+		messageClient.sendMessage("Error inviting user");
 		return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error inviting user").build();
 	}
 	}
@@ -110,6 +123,7 @@ public class BoardService {
 		return Response.ok(boards).build();
 	} catch (Exception e) {
 		e.printStackTrace();
+		messageClient.sendMessage("Error getting boards");
 		return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error getting boards").build();
 	}
 	}
@@ -122,11 +136,13 @@ public class BoardService {
 		if (board != null && leader != null) {
 			if (board.getTeamLeader() == leader) {
 				entityManager.remove(board);
-				messageClient.sendMessage("Board deleted" + board.getName());
+				messageClient.sendMessage("Board deleted " + board.getName());
 				return Response.status(Response.Status.OK).entity("Board deleted successfully").build();
 			}
+			messageClient.sendMessage("User is not a team leader of the board");
 			return Response.status(Response.Status.CONFLICT).entity("User is not a team leader of the board").build();
 		}
+		messageClient.sendMessage("Board not found");
 		return Response.status(Response.Status.NOT_FOUND).entity("Board not found").build();
 
 	}
@@ -135,11 +151,14 @@ public class BoardService {
 		Board board = entityManager.find(Board.class, boardId);
 		if (board != null) {
 			if (board.getMembersIds().contains(userId)) {
+				messageClient.sendMessage("User is a member of the board");
 				return true;
 			} else if (board.getTeamLeader().getUserId() == userId) {
+				messageClient.sendMessage("User is a team leader of the board");
 				return true;
 			}
 		}
+		messageClient.sendMessage("User is not a member of the board");
 		return false;
 	}
 
@@ -151,6 +170,7 @@ public class BoardService {
 			messageClient.sendMessage("Contributors retrieved");
 			return Response.ok(contributors).build();
 		}
+		messageClient.sendMessage("Contributors not retrieved");
 		return Response.status(Response.Status.NOT_FOUND).entity("Board not found").build();
 	}
 

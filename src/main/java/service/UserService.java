@@ -30,13 +30,16 @@ public class UserService {
 	public Response createUser(User user) {
 			// check if email is valid
 			if (!EmailValidator.isValid(user.getEmail()) || user.getEmail().isEmpty()) {
+				messageClient.sendMessage("Invalid email");
 				return Response.status(Response.Status.BAD_REQUEST).entity("Invalid email").build();
 			}
 			// check if password is valid
 			if (user.getPassword().isEmpty()) {
+				messageClient.sendMessage("Password cannot be empty");
 				return Response.status(Response.Status.BAD_REQUEST).entity("Password cannot be empty").build();
 			}
 			else if (user.getPassword().length() < 8) {
+				messageClient.sendMessage("Password must be at least 8 characters");
 				return Response.status(Response.Status.BAD_REQUEST).entity("Password must be at least 8 characters")
 						.build();
 			}
@@ -47,6 +50,7 @@ public class UserService {
 			return Response.status(Response.Status.CREATED).entity("User created with id: " + user.getUserId()).build();
 		} catch (Exception e) {
 			e.printStackTrace();
+			messageClient.sendMessage("Error creating user, user with same email");
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error creating user, user with same email").build();
 		}
 	}
@@ -70,9 +74,11 @@ public class UserService {
 				return Response.status(Response.Status.CREATED).entity("User updated successfully").build();
 			} catch (Exception e) {
 				e.printStackTrace();
+				messageClient.sendMessage("Error updating user");
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error updating user").build();
 			}
 		}
+		messageClient.sendMessage("User not found");
 		return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
 	}
 
@@ -85,6 +91,7 @@ public class UserService {
 			messageClient.sendMessage("User logged in: " + user.getUsername());
 			return "User logged in successfully";
 		}
+		messageClient.sendMessage("User not found");
 		return "User not found";
 	}
 
@@ -111,6 +118,7 @@ public class UserService {
 			messageClient.sendMessage("User deleted: " + user.getUsername());
 			return "User deleted successfully";
 		}
+		messageClient.sendMessage("User not found");
 		return "User not found";
 	}
 

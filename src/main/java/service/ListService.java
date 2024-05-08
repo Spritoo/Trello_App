@@ -27,15 +27,18 @@ public class ListService {
         // check if board exists
         Board board = entityManager.find(Board.class, boardId);
         if (board == null) {
+        	messageClient.sendMessage("Board not found");
             return Response.status(Response.Status.NOT_FOUND).entity("Board not found").build();
         }
         // check if user exists
         User user = entityManager.find(User.class, teamLeaderId);
         if (user == null) {
+        	messageClient.sendMessage("User not found");
             return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
         }
         // check if user is a teamLeader of the board
         if (!board.getTeamLeader().equals(user)) {
+        	messageClient.sendMessage("User is not a team leader of the board");
             return Response.status(Response.Status.UNAUTHORIZED).entity("User is not a team leader of the board")
                     .build();
         }
@@ -54,16 +57,19 @@ public class ListService {
 		// check if list exists
 		ListofCards list = entityManager.find(ListofCards.class, listId);
 		if (list == null) {
+			messageClient.sendMessage("List not found");
 			return Response.status(Response.Status.NOT_FOUND).entity("List not found").build();
 		}
 		// check if user exists
 		User user = entityManager.find(User.class, teamLeaderId);
 		if (user == null) {
+			messageClient.sendMessage("User not found");
 			return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
 		}
 		// check if user is a teamLeader of the board
 		Board board = list.getBoard();
 		if (!board.getTeamLeader().equals(user)) {
+			messageClient.sendMessage("User is not a team leader of the board");
 			return Response.status(Response.Status.UNAUTHORIZED).entity("User is not a team leader of the board")
 					.build();
 		}
@@ -77,14 +83,17 @@ public class ListService {
 	public Response getLists(Long boardId, Long userId) {
 		Board board = entityManager.find(Board.class, boardId);
 		if (board == null) {
+			messageClient.sendMessage("Board not found");
 			return Response.status(Response.Status.NOT_FOUND).entity("Board not found").build();
 		}
 		User user = entityManager.find(User.class, userId);
 		if (user == null) {
+			messageClient.sendMessage("User not found");
 			return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
 		}
 		Boolean isMember = board.getContributors().contains(user);
 		if (!isMember && !board.getTeamLeader().equals(user)) {
+			messageClient.sendMessage("User is not a member of the board");
 			return Response.status(Response.Status.UNAUTHORIZED).entity("User is not a member of the board").build();
 		}
 		Set<ListofCards> lists = board.getLists();
