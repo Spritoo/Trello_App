@@ -62,7 +62,7 @@ public class Board implements java.io.Serializable{
 	private long teamLeaderId;
 	
 	@OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.EAGER , orphanRemoval = true)
-    private Set<ListofCards> sprintLists;
+    private Set<Sprint> sprintLists;
 
 	public Board() {
 		super();

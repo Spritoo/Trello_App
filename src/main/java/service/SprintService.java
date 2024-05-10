@@ -1,5 +1,8 @@
 package service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -8,6 +11,7 @@ import javax.ws.rs.core.Response;
 
 import messagingSystem.client;
 import model.Board;
+import model.Card;
 import model.ListofCards;
 import model.Sprint;
 
@@ -19,51 +23,49 @@ public class SprintService {
 	@Inject
 	private client messageClient;
 	
-	public Response endSprint(long bloardId) {
-		//Check board done list make a new sprint appending to report string the done tasks with their importance and deleting them from done list
-		//then check to do , in progress lists and append them to the report string that theyre not completed
-		Board board = entityManager.find(Board.class, bloardId);
-		if (board == null) {
-			return Response.status(Response.Status.NOT_FOUND).entity("Board not found").build();
-		}
-		Sprint sprint = new Sprint();
-		sprint.setBoard(board);
-		try {
-		sprint.setBoard(entityManager.find(Board.class, bloardId));
-		sprint.setReport("Sprint report for board: "+ board.getName() + "\n\n" );
-		sprint.appendReport("Done tasks:\n");
-		
-		try {
-		board.DoneList().getCards().forEach(card -> {
-			sprint.appendReport(card.ParseCard() + "\n");
-			entityManager.remove(card);
-			entityManager.find(ListofCards.class, board.DoneList().getListId()).getCards().remove(card);
-			entityManager.flush();
-		});
-		sprint.appendReport("\n\nTasks in progress:");
-		board.InProgressList().getCards().forEach(card -> {
-			sprint.appendReport("\n" + card.ParseCard() );
-		});
-		
-		sprint.appendReport("\nTasks to do:\n");
-		board.ToDoList().getCards().forEach(card -> {
-		sprint.appendReport(card.ParseCard() + "\n");
-		});
-		messageClient.sendMessage("Sprint ended for board " + board.getName());
-		entityManager.persist(sprint);
-	} catch (Exception e) {
-		e.printStackTrace();
-		return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error finding lists").build();
+	public Response endSprint(long boardId) {
+	    Board board = entityManager.find(Board.class, boardId);
+	    if (board == null) {
+	        return Response.status(Response.Status.NOT_FOUND).entity("Board not found").build();
+	    }
+
+	    Sprint sprint = new Sprint();
+	    sprint.setBoard(board);
+
+	    try {
+	        StringBuilder reportBuilder = new StringBuilder("Sprint report for board: ").append(board.getName()).append("\n\n");
+
+	        // Process done tasks
+	        reportBuilder.append("Done tasks:\n");
+	        List<Card> doneTasks = new ArrayList<>(board.DoneList().getCards());
+	        for (Card card : doneTasks) {
+	            reportBuilder.append(card.ParseCard()).append("\n");
+	            entityManager.remove(card);
+	        }
+
+	        // Process tasks in progress
+	        reportBuilder.append("\nTasks in progress:\n");
+	        for (Card card : board.InProgressList().getCards()) {
+	            reportBuilder.append(card.ParseCard()).append("\n");
+	        }
+
+	        // Process tasks to do
+	        reportBuilder.append("\nTasks to do:\n");
+	        for (Card card : board.ToDoList().getCards()) {
+	            reportBuilder.append(card.ParseCard()).append("\n");
+	        }
+
+	        sprint.setReport(reportBuilder.toString());
+	        messageClient.sendMessage("Sprint ended for board " + board.getName());
+	        entityManager.persist(sprint);
+
+	        return Response.status(Response.Status.CREATED).entity("Sprint ended successfully with id : " + sprint.getId()).build();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error ending sprint").build();
+	    }
 	}
-	} catch (Exception e) {
-		e.printStackTrace();
-		return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error finding board").build();
-	}
-		
-		return Response.status(Response.Status.CREATED).entity("Sprint ended successfully with id : " + sprint.getId()).build();
-		
-		
-	}
+
 	
 	public Response getSprint(long sprintId) {
 		Sprint sprint = entityManager.find(Sprint.class, sprintId);
