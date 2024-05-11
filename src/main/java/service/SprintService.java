@@ -41,6 +41,7 @@ public class SprintService {
 	        for (Card card : doneTasks) {
 	            reportBuilder.append(card.ParseCard()).append("\n");
 	            entityManager.remove(card);
+	            entityManager.find(ListofCards.class, board.DoneList().getListId()).getCards().remove(card);
 	        }
 
 	        // Process tasks in progress

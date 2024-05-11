@@ -82,16 +82,19 @@ public class UserService {
 	}
 
 	public String loginUser(User loginUser) {
-		User user = entityManager
-				.createQuery("SELECT u FROM User u WHERE u.email = :email AND u.password = :password", User.class)
-				.setParameter("email", loginUser.getEmail()).setParameter("password", loginUser.getPassword())
-				.getSingleResult();
-		if (user != null) {
-			messageClient.sendMessage("User logged in: " + user.getUsername());
-			return "User logged in successfully";
+		try {
+			User user = entityManager.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class)
+					.setParameter("email", loginUser.getEmail()).getSingleResult();
+			if (user.getPassword().equals(loginUser.getPassword())) {
+				messageClient.sendMessage("User logged in: " + user.getUsername());
+				return "Login successful";
+			}
+		} catch (NoResultException e) {
+			messageClient.sendMessage("User not found");
+			return "User not found";
 		}
-		messageClient.sendMessage("User not found");
-		return "User not found";
+		messageClient.sendMessage("Login failed");
+		return "Login failed";
 	}
 
 //    public String updateUser(User updatedUser) {

@@ -1,4 +1,9 @@
-/messagingSystem/
-/service/
-/model/
+/.DS_Store
+/META-INF/
+/Service.class
+/WEB-INF/
 /controller/
+/messagingSystem/
+/model/
+/service/
+/util/
